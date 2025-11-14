@@ -374,9 +374,6 @@ SELECT * FROM employees WHERE first_name LIKE '_a%';
 -- NOT LIKE (exclude patterns)
 SELECT * FROM employees WHERE email NOT LIKE '%@company.com';
 
--- LIKE with multiple patterns
-SELECT * FROM employees WHERE (first_name LIKE 'J%' OR first_name LIKE 'M%') AND department = 'IT';
-
 -- Case-insensitive matching (Oracle)
 SELECT * FROM employees WHERE UPPER(last_name) LIKE 'SMITH%';
 ```
@@ -430,7 +427,7 @@ SELECT * FROM employees WHERE notes = q'<It's a test>';
 INSERT INTO employees (name, comments) VALUES ('John O''Brien', q'[He said, "It's fine"]');
 
 -- Instead of escaping: 'It''s'
-SELECT * FROM notes WHERE content = q'[It's working now]';
+SELECT * FROM employees WHERE content = q'[It's working now]';
 
 -- Nesting with different delimiters
 SELECT * FROM logs WHERE message = q'<Can't stop won't stop>';
@@ -704,7 +701,9 @@ SELECT DATE_ADD(hire_date, INTERVAL 30 DAY) FROM employees;
 SELECT DATEDIFF(NOW(), hire_date) AS days_employed FROM employees;
 
 -- Format date
-SELECT DATE_FORMAT(NOW(), '%d-%b-%Y %H:%i:%S') FROM dual;
+SELECT DATE_FORMAT(NOW(), '%d-%b-%Y %H:%i:%S') FROM dual; -- MySQL
+SELECT DATE_FORMAT(hire_date, '%Y/%m/%d') FROM employees; -- MySQL
+SELECT DATE_FORMAT(hire_date, '%W, %M %d, %Y') FROM employees; -- MySQL
 ```
 
 ---
@@ -786,5 +785,488 @@ Notes:
 - For advanced pagination and ANSI-compliant numbering, prefer ROW_NUMBER() OVER (...) when available.
 
 ---
+
+### REPLACE()
+- **Purpose**: Replace occurrences of a substring with another substring.
+- **Syntax (Oracle/MySQL)**: `REPLACE(string, search_string, replace_string)`
+- **Notes**: Oracle also provides REGEXP_REPLACE for regex-based and case-insensitive replacements.
+
+```sql
+-- Simple replacement (Oracle/MySQL)
+SELECT REPLACE(email, '@oldcompany.com', '@newcompany.com') FROM employees;
+
+-- Remove characters (e.g., dashes from phone numbers)
+SELECT emp_id, REPLACE(phone, '-', '') AS phone_digits FROM employees;
+
+-- Nested REPLACE for multiple simple substitutions
+SELECT REPLACE(REPLACE(address, ',', ''), '.', '') AS address_clean FROM locations;
+
+-- Oracle: regex replace (case-insensitive) to replace 'foo' with 'bar'
+SELECT REGEXP_REPLACE(notes, 'foo', 'bar', 1, 0, 'i') AS notes_fixed FROM logs;
+
+-- Oracle: remove all non-alphanumeric characters using regex
+SELECT REGEXP_REPLACE(product_code, '[^A-Za-z0-9]', '') AS product_clean FROM products;
+
+-- MySQL: REPLACE usage (no regex)
+SELECT REPLACE(description, 'old', 'new') AS description_new FROM products;
+```
+
+---
+
+## Single-Row Functions
+
+Single-row functions operate on individual rows and return one result per row. They can be used in SELECT, WHERE, and ORDER BY clauses. Consolidated here are all character, numeric, date, conversion, and conditional single-row functions with examples.
+
+### Character/String Functions
+
+#### INITCAP()
+- Purpose: Convert first letter of each word to uppercase, rest to lowercase
+- Syntax: `INITCAP(column)`
+
+```sql
+SELECT INITCAP(first_name), INITCAP(last_name) FROM employees;
+SELECT INITCAP('john smith') FROM dual;
+-- Handle hyphenated names
+SELECT REPLACE(INITCAP(REPLACE(last_name, '-', ' ')), ' ', '-') AS formatted_last_name
+FROM employees;
+```
+
+#### UPPER() / LOWER()
+- Purpose: Convert strings to uppercase or lowercase
+- Syntax: `UPPER(column)` / `LOWER(column)`
+
+```sql
+SELECT UPPER(first_name), LOWER(email) FROM employees;
+SELECT * FROM employees WHERE UPPER(last_name) = 'SMITH';
+```
+
+#### LENGTH()
+- Purpose: Return number of characters
+- Syntax: `LENGTH(column)` (Oracle) / `LEN(column)` (SQL Server)
+
+```sql
+SELECT first_name, LENGTH(first_name) AS name_length FROM employees;
+SELECT * FROM employees WHERE LENGTH(last_name) > 5;
+```
+
+#### SUBSTR() / SUBSTRING()
+- Purpose: Extract substring
+- Syntax: `SUBSTR(string, start [, length])` (Oracle) / `SUBSTRING(string, start, length)`
+
+```sql
+SELECT SUBSTR(first_name,1,3) AS first3 FROM employees;
+SELECT SUBSTR(first_name, -3) AS last3 FROM employees;
+-- username before '@'
+SELECT SUBSTR(email, 1, INSTR(email, '@') - 1) AS username FROM employees;
+```
+
+#### CONCAT() / ||
+- Purpose: Concatenate strings
+- Syntax: `CONCAT(arg1, arg2, ...)` or `str1 || str2` (Oracle)
+
+```sql
+SELECT first_name || ' ' || last_name AS full_name FROM employees;
+SELECT CONCAT(first_name, ' ', last_name) AS full_name FROM employees; -- MySQL/ANSI
+SELECT CONCAT_WS(' ', first_name, middle_name, last_name) AS full_name FROM employees; -- MySQL
+```
+
+#### TRIM() / LTRIM() / RTRIM()
+- Purpose: Remove leading/trailing characters (default whitespace)
+
+```sql
+SELECT TRIM('  hello  ') FROM dual;
+SELECT TRIM(BOTH '#' FROM '##value##') FROM dual;
+SELECT LTRIM('---note','-') FROM dual;
+SELECT RTRIM('note***','*') FROM dual;
+SELECT TRIM(first_name) || ' ' || TRIM(last_name) AS full_name FROM employees;
+```
+
+#### LPAD() / RPAD()
+- Purpose: Pad strings left or right to fixed length
+
+```sql
+SELECT LPAD(emp_id,5,'0') AS emp_id_padded FROM employees; -- 123 -> 00123
+SELECT RPAD(first_name || ' ' || last_name, 30, ' ') AS name_col FROM employees;
+SELECT RPAD(first_name, 20, '.') FROM employees;
+```
+
+#### REPLACE() / REGEXP_REPLACE()
+- Purpose: Replace substring (REGEXP_REPLACE for regex in Oracle)
+
+```sql
+SELECT REPLACE(email, '@oldcompany.com', '@newcompany.com') FROM employees;
+SELECT REPLACE(phone, '-', '') AS phone_digits FROM employees;
+SELECT REGEXP_REPLACE(notes, 'foo', 'bar', 1, 0, 'i') AS notes_fixed FROM logs; -- Oracle
+SELECT REGEXP_REPLACE(product_code, '[^A-Za-z0-9]', '') AS product_clean FROM products;
+```
+
+#### INSTR() / LOCATE()
+- Purpose: Find position of substring
+
+```sql
+SELECT email, INSTR(email, '@') AS at_pos FROM employees; -- Oracle
+SELECT INSTR('abracadabra','a',1,3) FROM dual; -- 3rd occurrence
+SELECT LOCATE('@', email) AS at_pos_locate FROM employees; -- MySQL
+```
+
+### Numeric Functions
+
+#### ROUND()
+- Purpose: Round number to specified decimals
+
+```sql
+SELECT salary, ROUND(salary, 2) FROM employees;
+SELECT ROUND(45.7) FROM dual;
+SELECT ROUND(45678, -2) FROM dual; -- 45700
+```
+
+#### TRUNC()
+- Purpose: Truncate number (no rounding)
+
+```sql
+SELECT TRUNC(50000.567, 2) FROM dual;
+SELECT TRUNC(45.9) FROM dual;
+```
+
+#### ABS(), CEIL(), FLOOR(), MOD(), POWER(), SQRT()
+- Purpose: Absolute, ceiling, floor, modulus, power, square root
+
+```sql
+SELECT ABS(-100) FROM dual;
+SELECT CEIL(45.2) FROM dual;
+SELECT FLOOR(45.9) FROM dual;
+SELECT MOD(emp_id,2) AS rem FROM employees;
+SELECT POWER(1.05, years) AS multiplier FROM investments;
+SELECT SQRT(16) FROM dual;
+```
+
+### Date Functions
+
+#### SYSDATE / NOW()
+- **Purpose**: Current date/time
+
+```sql
+SELECT SYSDATE FROM dual; -- Oracle
+SELECT NOW() FROM dual;   -- MySQL
+```
+
+#### ADD_MONTHS(), MONTHS_BETWEEN(), NEXT_DAY(), LAST_DAY() — additional examples
+
+```sql
+-- ADD_MONTHS: probation end date (3 months after hire)
+SELECT emp_id, hire_date,
+       ADD_MONTHS(hire_date, 3) AS probation_end
+FROM employees;
+
+-- ADD_MONTHS: calculate 5-year maturity date
+SELECT loan_id, start_date, ADD_MONTHS(start_date, 12 * 5) AS maturity_date
+FROM loans;
+
+-- MONTHS_BETWEEN: fractional months employed and whole months
+SELECT emp_id,
+       MONTHS_BETWEEN(SYSDATE, hire_date)                    AS months_employed_exact,
+       TRUNC(MONTHS_BETWEEN(SYSDATE, hire_date))             AS months_employed_whole,
+       ROUND(MONTHS_BETWEEN(SYSDATE, hire_date) / 12, 2)     AS years_employed_rounded
+FROM employees;
+
+-- MONTHS_BETWEEN: compare two dates (order matters: date1 - date2)
+SELECT TO_CHAR(hire_date,'DD-MON-YYYY') d,
+       TO_CHAR(SYSDATE,'DD-MON-YYYY') today,
+       MONTHS_BETWEEN(SYSDATE, hire_date) AS months_diff
+FROM employees
+WHERE emp_id = 101;
+
+-- NEXT_DAY: schedule next occurrence of a weekday (e.g., next Friday after SYSDATE)
+SELECT SYSDATE AS today,
+       NEXT_DAY(SYSDATE, 'FRIDAY') AS next_friday
+FROM dual;
+
+-- NEXT_DAY: find next Monday after hire_date (useful for onboarding)
+SELECT emp_id, hire_date, NEXT_DAY(hire_date, 'MONDAY') AS onboarding_monday
+FROM employees;
+
+-- LAST_DAY: last day of hire month and days remaining in hire month
+SELECT emp_id, hire_date,
+       LAST_DAY(hire_date) AS hire_month_end,
+       TRUNC(LAST_DAY(hire_date) - hire_date) AS days_until_month_end
+FROM employees;
+
+-- LAST_DAY: last day of next month
+SELECT SYSDATE,
+       LAST_DAY(ADD_MONTHS(SYSDATE, 1)) AS last_day_next_month
+FROM dual;
+
+-- Combined example: give bonus to employees employed at least 12 months
+SELECT emp_id, first_name, hire_date,
+       FLOOR(MONTHS_BETWEEN(SYSDATE, hire_date) / 12) AS years_employed
+FROM employees
+WHERE FLOOR(MONTHS_BETWEEN(SYSDATE, hire_date) / 12) >= 1;
+
+-- MySQL equivalents:
+-- ADD_MONTHS -> DATE_ADD(..., INTERVAL n MONTH)
+SELECT hire_date, DATE_ADD(hire_date, INTERVAL 3 MONTH) AS probation_end FROM employees;
+
+-- MONTHS_BETWEEN -> TIMESTAMPDIFF(MONTH, start_date, end_date)
+SELECT TIMESTAMPDIFF(MONTH, hire_date, NOW()) AS months_employed FROM employees;
+
+-- LAST_DAY exists in MySQL too
+SELECT hire_date, LAST_DAY(hire_date) AS hire_month_end FROM employees;
+
+-- NEXT_DAY not built-in in MySQL; compute next weekday (example: next Monday)
+-- (DAYOFWEEK: Sunday=1,... Saturday=7)
+SELECT hire_date,
+       DATE_ADD(hire_date,
+                INTERVAL ((9 - DAYOFWEEK(hire_date)) % 7) DAY) AS next_monday
+FROM employees;
+```
+
+---
+
+## Using Conversion Functions and Conditional Expressions
+
+This section groups conversion functions and conditional expressions used to transform and control output.
+
+### Conversion Functions
+
+- TO_CHAR (Oracle) / DATE_FORMAT (MySQL) — format dates/numbers as strings
+- TO_DATE (Oracle) / STR_TO_DATE (MySQL) — parse strings to dates
+- TO_NUMBER (Oracle) — parse strings to numbers
+- CAST (ANSI) — convert between types
+
+Examples:
+```sql
+-- Oracle: format date and number
+SELECT TO_CHAR(hire_date, 'DD-MON-YYYY') AS hire_fmt,
+       TO_CHAR(salary, 'FM999,999.99')       AS salary_fmt
+FROM employees;
+
+-- Oracle: parse string to date (with RR two-digit year handling)
+SELECT TO_DATE('01-JAN-30', 'DD-MON-RR') FROM dual;
+
+-- Oracle: parse number and use in calculation
+SELECT TO_NUMBER('12345') + 100 AS total FROM dual;
+
+-- ANSI CAST examples
+SELECT CAST(emp_id AS VARCHAR2(10)) AS emp_id_str FROM employees;
+SELECT CAST('2020-01-15' AS DATE) FROM dual; -- Oracle may need TO_DATE in practice
+
+-- MySQL: format & parse dates
+SELECT DATE_FORMAT(hire_date, '%d-%b-%Y') AS hire_fmt FROM employees;
+SELECT STR_TO_DATE('15-Jan-2020', '%d-%b-%Y') AS hire_date FROM dual;
+```
+
+Notes:
+- Use TO_CHAR to control locale/formatting (currency, leading zeros).
+- Prefer CAST for portability when supported; use Oracle-specific TO_*/DATE_FORMAT when exact behavior required.
+
+### Conditional Expressions
+
+- CASE (ANSI) — flexible searched or simple form
+- DECODE (Oracle) — Oracle shorthand for equality comparisons
+- COALESCE / NVL / NVL2 / NULLIF — NULL handling
+- IFNULL / IF (MySQL) — MySQL equivalents
+
+Examples:
+```sql
+-- CASE (searched)
+SELECT first_name,
+       CASE
+         WHEN salary >= 100000 THEN 'Executive'
+         WHEN salary >= 75000  THEN 'Senior'
+         WHEN salary >= 50000  THEN 'Mid-level'
+         ELSE 'Junior'
+       END AS grade
+FROM employees;
+
+-- CASE (simple)
+SELECT first_name,
+       CASE department
+         WHEN 'IT'     THEN 'Information Technology'
+         WHEN 'HR'     THEN 'Human Resources'
+         ELSE 'Other'
+       END AS dept_name
+FROM employees;
+
+-- DECODE (Oracle)
+SELECT emp_id, DECODE(status, 'A','Active','I','Inactive','Unknown') AS status_text FROM employees;
+
+-- COALESCE / NVL: first non-NULL
+SELECT first_name, COALESCE(middle_name, last_name, 'Unknown') AS name_fallback FROM employees;
+SELECT first_name, NVL(commission_pct, 0) AS commission FROM employees; -- Oracle
+
+-- NVL2: different results for NULL vs NOT NULL (Oracle)
+SELECT emp_id, NVL2(commission_pct, 'Has Commission', 'No Commission') AS comm_status FROM employees;
+
+-- NULLIF: return NULL when equal (avoid divide-by-zero)
+SELECT revenue, costs, revenue / NULLIF(costs, 0) AS profit_margin FROM quarters;
+
+-- MySQL IFNULL / IF
+SELECT first_name, IFNULL(commission_pct, 0) AS commission FROM employees;
+SELECT emp_id, IF(salary > 100000, 'High', 'Normal') AS tier FROM employees;
+```
+
+Best practices:
+- Use COALESCE for portable multi-argument NULL fallback.
+- Use CASE for complex conditional logic; prefer over nested IF/DECODE for readability.
+- Use NULLIF to protect calculations (e.g., divide-by-zero).
+- Format final output with TO_CHAR / DATE_FORMAT as the last step in SELECT.
+
+---
+
+## Appendix A: Common SQL Errors and Troubleshooting
+
+### Syntax Errors
+- **Missing commas** between column names or values.
+- **Unmatched parentheses** in expressions or function calls.
+- **Incorrectly spelled SQL keywords** (e.g., SELEC instead of SELECT).
+
+**Examples**:
+```sql
+-- Missing comma
+SELECT first_name last_name FROM employees;
+
+-- Unmatched parentheses
+SELECT * FROM employees WHERE (department = 'IT' AND salary > 50000;
+
+-- Incorrect keyword
+SELEC * FROM employees;
+```
+
+### Logical Errors
+- **Wrong use of operators** (e.g., using = instead of IN for a list).
+- **Misplaced or missing parentheses** affecting order of evaluation.
+- **Using AND where OR is needed**, or vice versa.
+
+**Examples**:
+```sql
+-- Using = instead of IN
+SELECT * FROM employees WHERE department_id = (10, 20, 30);
+
+-- Misplaced parentheses
+SELECT * FROM employees WHERE department = 'IT' AND (salary > 50000 OR bonus > 1000;
+
+-- AND instead of OR
+SELECT * FROM employees WHERE department = 'IT' AND salary > 50000 AND department = 'HR';
+```
+
+### Common Warnings
+- **Deprecated features**: Using features or syntax that are outdated and may be removed in future versions.
+- **Performance warnings**: Such as those for Cartesian products (missing JOIN conditions).
+
+**Examples**:
+```sql
+-- Deprecated: old-style outer join
+SELECT * FROM employees, departments WHERE employees.dept_id = departments.dept_id(+);
+
+-- Performance warning: Cartesian product
+SELECT * FROM employees, departments;
+```
+
+### Troubleshooting Tips
+- **Check SQL syntax**: Use a SQL reference or documentation for the correct syntax.
+- **Break down complex queries**: Simplify queries to isolate the part causing the error.
+- **Use comments**: Temporarily comment out parts of the query to identify the issue.
+- **Consult the database documentation**: For specific functions, operators, or error codes.
+- **Ask for help**: When stuck, seek assistance from forums, colleagues, or instructors.
+
+---
+
+## Appendix B: Useful SQL Scripts and Queries
+
+### 1. Find Duplicate Rows
+```sql
+SELECT column1, column2, COUNT(*)
+FROM table_name
+GROUP BY column1, column2
+HAVING COUNT(*) > 1;
+```
+
+### 2. Delete Duplicate Rows (Keep One)
+```sql
+DELETE FROM table_name
+WHERE rowid NOT IN (
+  SELECT MIN(rowid)
+  FROM table_name
+  GROUP BY column1, column2
+);
+```
+
+### 3. Select Distinct Values
+```sql
+SELECT DISTINCT column1, column2
+FROM table_name;
+```
+
+### 4. Count Rows in a Table
+```sql
+SELECT COUNT(*) FROM table_name;
+```
+
+### 5. Find Maximum/Minimum Value
+```sql
+SELECT MAX(column_name), MIN(column_name)
+FROM table_name;
+```
+
+### 6. Calculate Average Value
+```sql
+SELECT AVG(column_name) FROM table_name;
+```
+
+### 7. Sum Values
+```sql
+SELECT SUM(column_name) FROM table_name;
+```
+
+### 8. Group By Example
+```sql
+SELECT column1, COUNT(*)
+FROM table_name
+GROUP BY column1
+ORDER BY COUNT(*) DESC;
+```
+
+### 9. Having Clause Example
+```sql
+SELECT column1, SUM(column2)
+FROM table_name
+GROUP BY column1
+HAVING SUM(column2) > 1000;
+```
+
+### 10. Join Example
+```sql
+SELECT a.column1, b.column2
+FROM table1 a
+JOIN table2 b ON a.common_field = b.common_field
+WHERE a.condition_field = 'some_value';
+```
+
+---
+
+## Appendix C: SQL Resources and Further Reading
+
+- **Books**:
+  - "SQL in 10 Minutes, Sams Teach Yourself" by Ben Forta
+  - "Learning SQL" by Alan Beaulieu
+  - "SQL Cookbook" by Anthony Molinaro
+
+- **Online Tutorials**:
+  - W3Schools SQL Tutorial
+  - SQLZoo
+  - Mode Analytics SQL Tutorial
+
+- **Documentation**:
+  - Oracle SQL Language Reference
+  - MySQL Documentation
+  - PostgreSQL Documentation
+
+- **Forums and Q&A Sites**:
+  - Stack Overflow
+  - Oracle Community
+  - MySQL Forums
+
+---
+
 **Last Updated**: November 14, 2025
 **Course**: Oracle 19c SQL Workshop
