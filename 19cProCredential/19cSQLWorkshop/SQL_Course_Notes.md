@@ -447,6 +447,50 @@ SELECT * FROM logs WHERE message = q'<Can't stop won't stop>';
 - DISTINCT keyword
 - Filtering and Sorting
 
+### ORDER BY (Sorting)
+- **Purpose**: Sort result sets by one or more columns or expressions.
+- **Syntax**: `SELECT columns FROM table [WHERE ...] ORDER BY expression [ASC|DESC] [, expression2 [ASC|DESC], ...];`
+- **Default**: ASC (ascending)
+- **Multiple columns**: Primary sort by the first expression, then tie-breakers by subsequent expressions.
+- **NULL ordering (Oracle)**: `NULLS FIRST` or `NULLS LAST` (use to control where NULLs appear).
+- **Other notes**:
+  - You can ORDER BY column position (e.g., `ORDER BY 2`) or column alias.
+  - Expressions and functions are allowed in ORDER BY.
+  - ORDER BY is applied after SELECT projection and WHERE filtering.
+
+**Examples**:
+```sql
+-- Simple ascending
+SELECT first_name, last_name, salary
+FROM employees
+ORDER BY last_name;
+
+-- Descending
+SELECT first_name, last_name, salary
+FROM employees
+ORDER BY salary DESC;
+
+-- Multiple columns (department, then salary desc)
+SELECT first_name, last_name, department, salary
+FROM employees
+ORDER BY department, salary DESC;
+
+-- NULL handling (Oracle)
+SELECT first_name, commission_pct
+FROM employees
+ORDER BY commission_pct DESC NULLS LAST;
+
+-- Order by expression / alias
+SELECT first_name, last_name, salary, salary * 1.1 AS adj_salary
+FROM employees
+ORDER BY adj_salary DESC;
+
+-- Order by column position (3 = salary)
+SELECT first_name, last_name, salary
+FROM employees
+ORDER BY 3 DESC;
+```
+
 ## Data Manipulation
 - INSERT statements
 - UPDATE statements
