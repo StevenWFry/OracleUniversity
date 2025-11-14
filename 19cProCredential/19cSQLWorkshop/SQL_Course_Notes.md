@@ -11,11 +11,7 @@
    - [LIKE Operator](#like-operator)
    - [Escape Character](#escape-character)
    - [Q Operator](#q-operator-oracle-string-literals)
-2. [Data Retrieval](#data-retrieval)
-3. [Data Manipulation](#data-manipulation)
-4. [Database Objects](#database-objects)
-5. [Advanced Topics](#advanced-topics)
-   - [Date Differences: Oracle vs MySQL](#date-differences-oracle-vs-mysql)
+   - [Substitution Variables](#substitution-variables-sqlplus--sqlcl)
 
 ## SQL Fundamentals
 - **Definition**: Structured Query Language for managing relational databases
@@ -440,6 +436,78 @@ SELECT * FROM notes WHERE content = q'[It's working now]';
 SELECT * FROM logs WHERE message = q'<Can't stop won't stop>';
 ```
 
+### Substitution Variables (SQL*Plus / SQLcl)
+
+- Purpose: Provide run-time values to scripts or prompt users; two flavors: substitution variables (&, &&) and bind variables (:).
+- Context: Used in SQL*Plus, SQLcl, SQL Developer script execution.
+
+Basic substitution
+```sql
+-- Prompts for value each time & is used
+SELECT * FROM employees WHERE department_id = &dept_id;
+
+-- Persistent after first prompt (&&)
+SELECT * FROM employees WHERE department_id = &&dept_id;
+SELECT * FROM departments WHERE department_id = &&dept_id;
+```
+
+Positional parameters (script)
+```sql
+-- script: find_by_dept.sql
+SELECT * FROM employees WHERE department_id = &1;
+
+-- Run from SQL*Plus / SQLcl:
+@find_by_dept.sql 30
+```
+
+ACCEPT / DEFINE
+```sql
+-- Prompt with ACCEPT and reuse variable
+ACCEPT dept PROMPT 'Enter department id: '
+SELECT * FROM employees WHERE department_id = &dept;
+
+-- Define without prompting
+DEFINE dept = 50
+SELECT * FROM employees WHERE department_id = &dept;
+```
+
+Control substitution behavior
+```sql
+SET VERIFY OFF;    -- don't show before/after substitution
+SET VERIFY ON;     -- show substitution
+SET DEFINE OFF;    -- disable & substitution (useful for scripts with & literals)
+```
+
+### VERIFY and ECHO (SQL*Plus / SQLcl)
+- SET VERIFY: shows the SQL before and after substitution when ON.
+- SET ECHO: when ON, echoes commands in a script as they are executed.
+- PROMPT / ECHO: print messages (PROMPT works in SQL*Plus; SQLcl supports ECHO).
+
+**Examples**
+```sql
+-- VERIFY ON shows substitution details
+SET VERIFY ON
+DEFINE dept = 10
+SELECT * FROM employees WHERE department_id = &dept;
+-- Output will show:
+-- old  1: SELECT * FROM employees WHERE department_id = &dept
+-- new  1: SELECT * FROM employees WHERE department_id = 10
+
+-- Turn VERIFY off to suppress the before/after lines
+SET VERIFY OFF
+
+-- Use SET ECHO in scripts to display commands as they run
+SET ECHO ON
+-- script: show_dept.sql
+PROMPT Running department query...
+ACCEPT dept PROMPT 'Enter department id: '
+SELECT * FROM employees WHERE department_id = &dept;
+SET ECHO OFF
+
+-- SQLcl's ECHO prints text (SQL*Plus uses PROMPT)
+ECHO 'Script completed successfully.'
+```
+
 ## Data Retrieval
 - SELECT statements
 - WHERE clauses
@@ -475,21 +543,101 @@ SELECT first_name, last_name, department, salary
 FROM employees
 ORDER BY department, salary DESC;
 
+-- Order by expression / alias (ascending/descending using alias)
+SELECT first_name, last_name, salary, salary * 1.1 AS adj_salary
+FROM employees
+ORDER BY adj_salary DESC, last_name ASC;
+
 -- NULL handling (Oracle)
 SELECT first_name, commission_pct
 FROM employees
 ORDER BY commission_pct DESC NULLS LAST;
-
--- Order by expression / alias
-SELECT first_name, last_name, salary, salary * 1.1 AS adj_salary
-FROM employees
-ORDER BY adj_salary DESC;
-
--- Order by column position (3 = salary)
-SELECT first_name, last_name, salary
-FROM employees
-ORDER BY 3 DESC;
 ```
+
+### FETCH and OFFSET (ANSI Pagination)
+
+- **Purpose**: Standard pagination syntax supported by Oracle 12c+ and many other RDBMS.
+- **Notes**: ORDER BY should be used for deterministic paging. FETCH/OFFSET are applied after ORDER BY.
+
+**Syntax (Oracle 12c+ / ANSI)**:
+```sql
+SELECT columns
+FROM table
+ORDER BY expression
+OFFSET <n> ROWS
+FETCH NEXT <m> ROWS ONLY;
+```
+
+**Examples**:
+```sql
+-- Top 5 rows by salary (equivalent to FETCH FIRST 5 ROWS ONLY)
+SELECT * FROM employees
+ORDER BY salary DESC
+FETCH FIRST 5 ROWS ONLY;
+
+-- Page 1 (rows 1-10)
+SELECT * FROM employees
+ORDER BY hire_date DESC
+OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;
+
+-- Page 3 (rows 21-30)
+SELECT * FROM employees
+ORDER BY hire_date DESC
+OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY;
+
+-- Using FETCH with WITH TIES (returns additional rows that tie on ORDER BY expression)
+SELECT * FROM employees
+ORDER BY salary DESC
+FETCH FIRST 5 ROWS WITH TIES;
+
+-- Combined with projection/alias
+SELECT emp_id, first_name, last_name, salary,
+       ROW_NUMBER() OVER (ORDER BY salary DESC) AS rn
+FROM employees
+ORDER BY salary DESC
+OFFSET 10 ROWS FETCH NEXT 10 ROWS ONLY;
+```
+
+**MySQL equivalents**:
+```sql
+-- MySQL: LIMIT count OFFSET offset
+SELECT * FROM employees ORDER BY hire_date DESC LIMIT 10 OFFSET 20;
+-- or
+SELECT * FROM employees ORDER BY hire_date DESC LIMIT 20, 10;
+```
+
+### LIMIT (MySQL / PostgreSQL)
+- **Purpose**: Simplified pagination/row limiting used by MySQL and PostgreSQL.
+- **Notes**: ORDER BY is recommended for deterministic results. LIMIT can be used with or without OFFSET.
+- **Syntax**:
+  - LIMIT count
+  - LIMIT count OFFSET offset
+  - MySQL alternate: LIMIT offset, count
+
+**Examples**:
+```sql
+-- Top 5 rows
+SELECT * FROM employees
+ORDER BY salary DESC
+LIMIT 5;
+
+-- Page 1 (rows 1-10)
+SELECT * FROM employees
+ORDER BY hire_date DESC
+LIMIT 10 OFFSET 0;
+
+-- Page 3 (rows 21-30)
+SELECT * FROM employees
+ORDER BY hire_date DESC
+LIMIT 10 OFFSET 20;
+
+-- MySQL alternate syntax (offset, count)
+SELECT * FROM employees
+ORDER BY hire_date DESC LIMIT 20, 10;
+```
+
+-- Mapping to OFFSET/FETCH:
+- LIMIT 10 OFFSET 20  <=>  OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY
 
 ## Data Manipulation
 - INSERT statements
@@ -558,6 +706,84 @@ SELECT DATEDIFF(NOW(), hire_date) AS days_employed FROM employees;
 -- Format date
 SELECT DATE_FORMAT(NOW(), '%d-%b-%Y %H:%i:%S') FROM dual;
 ```
+
+---
+
+### Subqueries (Subselects)
+- **Purpose**: Use a SELECT inside another statement to provide values or filter rows.
+- **Types**: Scalar (single value), Single-row, Multi-row, Correlated, Inline view (FROM subquery).
+
+**Examples**:
+```sql
+-- Simple IN subquery (multi-row)
+SELECT * FROM employees
+WHERE department_id IN (SELECT department_id FROM departments WHERE location_id = 1700);
+
+-- Correlated subquery (references outer query)
+SELECT e.first_name, e.last_name, e.salary, e.department_id
+FROM employees e
+WHERE e.salary > (
+  SELECT AVG(salary)
+  FROM employees
+  WHERE department_id = e.department_id
+);
+
+-- EXISTS (efficient for existence checks)
+SELECT e.*
+FROM employees e
+WHERE EXISTS (
+  SELECT 1 FROM bonuses b WHERE b.emp_id = e.emp_id AND b.amount > 1000
+);
+
+-- Scalar subquery in SELECT (returns single value per row)
+SELECT e.emp_id, e.first_name,
+       (SELECT COUNT(*) FROM orders o WHERE o.emp_id = e.emp_id) AS order_count
+FROM employees e;
+
+-- Inline view (FROM subquery) with aggregation filtering
+SELECT dept, avg_sal
+FROM (
+  SELECT department_id AS dept, AVG(salary) AS avg_sal
+  FROM employees
+  GROUP BY department_id
+) d
+WHERE avg_sal > 70000;
+```
+
+### ROWNUM (Oracle) — limiting and pagination patterns
+- **Purpose**: Pseudo-column that numbers rows returned by a query (assigned before ORDER BY in a single SELECT).
+- **Common use**: Limit top N rows in Oracle 11g and earlier. For ordered top-N, apply ORDER BY inside a subquery.
+
+**Examples**:
+```sql
+-- Top 5 arbitrary rows (order not guaranteed)
+SELECT * FROM employees WHERE ROWNUM <= 5;
+
+-- Correct way to get top 5 by salary (ORDER BY must happen before ROWNUM filter)
+SELECT * FROM (
+  SELECT * FROM employees ORDER BY salary DESC
+) WHERE ROWNUM <= 5;
+
+-- Pagination pattern: rows 6-10 using nested ROWNUM
+SELECT * FROM (
+  SELECT e.*, ROWNUM rnum
+  FROM (
+    SELECT * FROM employees ORDER BY salary DESC
+  ) e
+  WHERE ROWNUM <= 10
+)
+WHERE rnum > 5;
+
+-- Preferred modern approach: ROW_NUMBER() analytic function (more flexible)
+SELECT * FROM (
+  SELECT e.*, ROW_NUMBER() OVER (ORDER BY salary DESC) rn
+  FROM employees e
+) WHERE rn BETWEEN 1 AND 5;
+```
+
+Notes:
+- ROWNUM is assigned as rows are returned; it cannot be reliably used with ORDER BY in the same SELECT without nesting.
+- For advanced pagination and ANSI-compliant numbering, prefer ROW_NUMBER() OVER (...) when available.
 
 ---
 **Last Updated**: November 14, 2025
