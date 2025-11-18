@@ -8,6 +8,7 @@
 5. [Detailed Examples](#detailed-examples)
 6. [Advanced Group Function Techniques](#advanced-group-function-techniques)
 7. [Best Practices](#best-practices)
+8. [Summary](#summary)
 
 ---
 
@@ -112,21 +113,26 @@ SELECT MAX(last_name) AS last_alphabetically FROM employees;
 
 ### Using GROUP BY Clause
 
-The `GROUP BY` clause groups rows with identical values in specified column(s).
+The `GROUP BY` clause groups rows with identical values in specified column(s). It allows you to write queries that use group functions.
 
 **Syntax**:
 ```sql
-SELECT column1, aggregate_function(column2)
-FROM table_name
-WHERE condition
-GROUP BY column1
-ORDER BY aggregate_function(column2);
+SELECT column, group_function
+FROM table
+[WHERE condition]
+GROUP BY group_by_expression
+[HAVING group_condition]
+[ORDER BY column];
 ```
 
 **Rules for GROUP BY**:
 1. Any column in SELECT not in an aggregate function must be in GROUP BY
 2. GROUP BY is executed before HAVING
 3. Multiple columns can be grouped together
+4. WHERE clause is applied before GROUP BY
+5. HAVING clause is applied after GROUP BY
+
+**Examples**:
 
 ```sql
 -- Single column grouping
@@ -146,6 +152,12 @@ WHERE salary > 50000
 GROUP BY department;
 ```
 
+**Key Points**:
+- GROUP BY groups all rows with the same value(s) in the specified column(s)
+- The result set includes one row for each group
+- Aggregate functions calculate values across each group
+- NULLs are grouped together as a single group (if grouping on that column)
+
 ---
 
 ### HAVING Clause
@@ -154,16 +166,19 @@ The `HAVING` clause filters group results (applied after GROUP BY), similar to W
 
 **Syntax**:
 ```sql
-SELECT column1, aggregate_function(column2)
-FROM table_name
-GROUP BY column1
-HAVING aggregate_condition
-ORDER BY aggregate_function(column2);
+SELECT column, group_function
+FROM table
+WHERE condition
+GROUP BY column
+HAVING group_condition
+ORDER BY column;
 ```
 
 **WHERE vs HAVING**:
-- **WHERE**: Filters individual rows before grouping
-- **HAVING**: Filters groups after aggregation
+- **WHERE**: Filters individual rows before grouping (executed first)
+- **HAVING**: Filters groups after aggregation (executed after GROUP BY)
+
+**Examples**:
 
 ```sql
 -- HAVING example: departments with more than 5 employees
@@ -178,7 +193,25 @@ FROM employees
 WHERE hire_date >= TO_DATE('2020-01-01', 'YYYY-MM-DD')
 GROUP BY department
 HAVING AVG(salary) > 60000;
+
+-- HAVING with multiple conditions
+SELECT department, COUNT(*) AS emp_count, AVG(salary) AS avg_salary
+FROM employees
+GROUP BY department
+HAVING COUNT(*) > 3 AND AVG(salary) > 50000;
+
+-- Find departments with more than $1 million in total salary
+SELECT department, SUM(salary) AS total_salary
+FROM employees
+GROUP BY department
+HAVING SUM(salary) > 1000000;
 ```
+
+**Important Notes about HAVING**:
+- Cannot use column alias in HAVING clause
+- Can reference columns not in SELECT list
+- Uses same aggregate functions as SELECT clause
+- Executes after GROUP BY
 
 ---
 
@@ -342,40 +375,7 @@ ORDER BY hire_year DESC;
 ```sql
 SELECT 
   department,
-  COUNT(*) AS emp_count,
-  SUM(salary) AS total_salary,
-  ROUND(AVG(salary), 2) AS avg_salary,
-  ROUND(MAX(salary), 2) AS top_salary,
-  ROUND(MIN(salary), 2) AS bottom_salary
-FROM employees
-GROUP BY department
-HAVING SUM(salary) > 500000
-ORDER BY total_salary DESC;
-```
-
----
-
-### Advanced Group Function Techniques
-
-#### Nested Group Functions (Aggregate of Aggregates)
-```sql
--- Find the average of department averages
-SELECT ROUND(AVG(dept_avg), 2) AS overall_avg_salary
-FROM (
-  SELECT AVG(salary) AS dept_avg
-  FROM employees
-  GROUP BY department
-);
-```
-
-#### Conditional Aggregation with CASE
-```sql
--- Count employees by salary level
-SELECT 
-  department,
-  COUNT(CASE WHEN salary < 50000 THEN 1 END) AS junior_staff,
-  COUNT(CASE WHEN salary >= 50000 AND salary < 100000 THEN 1 END) AS mid_level,
-  COUNT(CASE WHEN salary >= 100000 THEN 1 END) AS senior_staff,
+  COUNT(*)
   COUNT(*) AS total
 FROM employees
 GROUP BY department;
