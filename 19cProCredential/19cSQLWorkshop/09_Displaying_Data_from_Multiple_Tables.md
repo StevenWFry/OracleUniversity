@@ -639,6 +639,114 @@ ORDER BY e.last_name;
 
 ---
 
+### Non-Equi (Non-Equality) Joins
+
+**Purpose**: Join rows using conditions other than equality (>, <, BETWEEN, <>). Useful for range matching, grade lookups, effective-dated joins, nearest-match, and other theta joins.
+
+**Notes**:
+- Also called theta joins.
+- Often less index-friendly than equality joins; watch performance and consider pre-filtering or using indexed computed columns, LATERAL queries, or window functions as alternatives.
+
+**Examples**:
+
+```sql
+-- 1) Range join: match employee salary to salary grade table
+SELECT 
+  e.emp_id,
+  e.first_name,
+  e.salary,
+  s.grade_level
+FROM employees e
+JOIN salary_grades s
+  ON e.salary BETWEEN s.min_salary AND s.max_salary
+ORDER BY e.salary DESC;
+
+-- 2) Open-ended range join: assign orders to discount tiers (max_total NULL means no upper bound)
+SELECT 
+  o.order_id,
+  o.order_total,
+  t.tier_name
+FROM orders o
+JOIN discount_tiers t
+  ON o.order_total >= t.min_total
+  AND (o.order_total < t.max_total OR t.max_total IS NULL);
+
+-- 3) Date-interval / effective-dated join: find rate valid on order_date
+SELECT
+  o.order_id,
+  o.order_date,
+  r.rate
+FROM orders o
+JOIN rates r
+  ON r.product_id = o.product_id
+  AND o.order_date BETWEEN r.effective_from AND NVL(r.effective_to, DATE '9999-12-31');
+
+-- 4) Nearest-date (non-equi) using LATERAL (Oracle/Postgres) - find most recent bonus before hire anniversary
+-- Oracle syntax: CROSS APPLY (use LATERAL in Postgres)
+SELECT 
+  e.emp_id,
+  e.hire_date,
+  b.bonus_date,
+  b.bonus_amount
+FROM employees e
+CROSS APPLY (
+  SELECT b2.bonus_date, b2.bonus_amount
+  FROM bonuses b2
+  WHERE b2.emp_id = e.emp_id
+    AND b2.bonus_date <= e.hire_date
+  ORDER BY b2.bonus_date DESC
+  FETCH FIRST 1 ROWS ONLY
+) b;
+
+-- 5) Inequality join (theta): employees paid above their department average
+SELECT 
+  e.emp_id,
+  e.first_name,
+  e.salary,
+  dept_avg.avg_salary
+FROM employees e
+JOIN (
+  SELECT department_id, AVG(salary) AS avg_salary
+  FROM employees
+  GROUP BY department_id
+) dept_avg
+  ON e.department_id = dept_avg.department_id
+  AND e.salary > dept_avg.avg_salary
+ORDER BY e.salary DESC;
+
+-- 6) "Band" join: find items that fall into price bands (non-equi with multiple bands)
+SELECT 
+  p.product_id,
+  p.price,
+  b.band_name
+FROM products p
+JOIN price_bands b
+  ON p.price >= b.min_price
+  AND p.price < b.max_price;
+
+-- 7) Pairwise proximity (find employees with salary within $5k of each other)
+SELECT 
+  e1.emp_id AS emp_a,
+  e1.first_name AS name_a,
+  e1.salary AS sal_a,
+  e2.emp_id AS emp_b,
+  e2.first_name AS name_b,
+  e2.salary AS sal_b
+FROM employees e1
+JOIN employees e2
+  ON e1.emp_id < e2.emp_id
+  AND ABS(e1.salary - e2.salary) <= 5000
+ORDER BY sal_a DESC, sal_b DESC;
+
+-- 8) Alternative using window functions to avoid heavy non-equi self-joins:
+-- Find previous salary change per employee (often preferable to non-equi joins)
+SELECT emp_id, salary, change_date,
+       LAG(salary) OVER (PARTITION BY emp_id ORDER BY change_date) AS prev_salary
+FROM salary_history;
+```
+
+---
+
 ### Multiple Joins
 
 **Purpose**: Combine data from 3 or more tables to create comprehensive reports.
@@ -753,88 +861,6 @@ ON e.department_id = d.department_id;
 
 #### 2. Join Order
 ```sql
--- Start with most restrictive table first
--- ✅ GOOD: Filters first, then joins
-SELECT e.first_name, d.department_name
-FROM employees e
-INNER JOIN departments d
-ON e.department_id = d.department_id
-WHERE e.salary > 100000;
-
--- Less optimal: May process more rows
-SELECT e.first_name, d.department_name
-FROM departments d
-INNER JOIN employees e
-ON d.department_id = e.department_id
-WHERE e.salary > 100000;
-```
-
-#### 3. Avoid Functions on Join Columns
-```sql
--- ❌ POOR: Function on indexed column disables index
-SELECT e.first_name, d.department_name
-FROM employees e
-INNER JOIN departments d
-ON UPPER(e.department_code) = UPPER(d.code);
-
--- ✅ GOOD: Direct comparison uses index
-SELECT e.first_name, d.department_name
-FROM employees e
-INNER JOIN departments d
-ON e.department_id = d.department_id;
-```
-
----
-
-### Best Practices
-
-1. **Use meaningful table aliases**
-   ```sql
-   -- ❌ Unclear
-   SELECT a.b, c.d FROM employees a, departments c;
-   
-   -- ✅ Clear
-   SELECT e.first_name, d.department_name FROM employees e, departments d;
-   ```
-
-2. **Specify all columns explicitly**
-   ```sql
-   -- ❌ Avoid SELECT *
-   SELECT * FROM employees e INNER JOIN departments d ON e.department_id = d.department_id;
-   
-   -- ✅ Select needed columns
-   SELECT e.emp_id, e.first_name, d.department_name FROM employees e
-   INNER JOIN departments d ON e.department_id = d.department_id;
-   ```
-
-3. **Put join conditions in ON clause, filters in WHERE**
-   ```sql
-   -- ✅ CORRECT
-   SELECT e.first_name, d.department_name
-   FROM employees e
-   INNER JOIN departments d ON e.department_id = d.department_id
-   WHERE e.salary > 50000;
-   ```
-
-4. **Use INNER JOIN unless OUTER is needed**
-   ```sql
-   -- INNER JOIN is more efficient
-   SELECT e.first_name, d.department_name
-   FROM employees e
-   INNER JOIN departments d ON e.department_id = d.department_id;
-   ```
-
-5. **Validate join results with row counts**
-   ```sql
-   -- Check for unexpected duplicates
-   SELECT COUNT(*) FROM employees;  -- 100 rows
-   SELECT COUNT(*) FROM employees e
-   INNER JOIN departments d ON e.department_id = d.department_id;  -- Should still be ~100
-   ```
-
-6. **Use COALESCE for OUTER JOIN NULL handling**
-   ```sql
-   -- Handle NULLs from outer joins
    SELECT 
      COALESCE(e.emp_id, 'No Employee') AS emp_id,
      COALESCE(d.department_name, 'No Department') AS dept_name
