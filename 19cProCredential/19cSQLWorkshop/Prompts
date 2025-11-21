@@ -1,3 +1,45 @@
+GitHub Copilot
+
+Overall: solid, well‑organized set of lesson notes that cover core topics (fundamentals, joins, group functions, subqueries, set operators, DML). Below are concise, actionable suggestions to make the docs stronger for study and practice.
+
+Strengths
+
+Good topic coverage for an introductory-to-intermediate course.
+Clear examples for most concepts (joins, aggregates, subqueries, set ops, DML).
+Oracle‑specific syntax and cross‑DB notes included in places.
+High‑impact suggestions
+
+Add a single course index (SQL_Course_Notes.md / course-overview.md) with links to each lesson and last‑updated timestamps so navigation is easy.
+Provide a sample schema + seed data script (CREATE TABLE + INSERTs) in the repo so readers can run examples end‑to‑end.
+Add exercises and answers for each lesson (beginner → advanced) and small quizzes to test comprehension.
+Include expected output for key examples (a few rows) so learners can verify results quickly.
+Add an “EXPLAIN/Execution plan” section with examples (Oracle: EXPLAIN PLAN / DBMS_XPLAN, MySQL: EXPLAIN) for join/aggregate queries to teach performance thinking.
+Add a short SQL style / formatting guide and naming conventions used across docs (aliases, capitalization, indentation).
+Add common pitfalls and gotchas (NULL with NOT IN, COUNT vs COUNT(*), GROUP BY rules, implicit commits on DDL, data type mismatches).
+Add a chapter or appendix on window/analytic functions and basic indexing & constraints (primary/foreign/indexes) — very useful for intermediate learners.
+Ensure each doc states DB compatibility and flags Oracle‑specific syntax vs ANSI (e.g., MINUS vs EXCEPT, NVL vs COALESCE).
+Provide a “cheat sheet” PDF or single page with common commands and syntax.
+Add visual aids: simple ER diagrams for schema used in examples and diagrams for join types and execution order (WHERE→GROUP BY→HAVING→ORDER BY).
+Maintenance & repo hygiene
+
+Keep Last Updated consistent across files; consider a changelog or commit reference.
+Standardize filenames and headings (prefix with two‑digit lesson number, you already do that — keep in every file).
+Consider a tests/verify folder with SQL scripts that run against a sample DB (or instructions to run via Docker/Oracle XE).
+Optional extras (nice to have)
+
+Add answers as collapsible sections or separate “solutions” files.
+Add performance recipes (rewrite correlated subqueries as joins, use analytic functions instead of complex joins).
+Add links to further reading: Oracle docs, SQL style guides, explain plan tutorials.
+Add a short section on tools (SQL*Plus, SQL Developer, SQLcl, DBeaver) and how to run the provided scripts on Windows.
+If you want, I can:
+
+Generate a sample schema + INSERT script placed in c:\Users\fry\Documents\repos\OracleUniversity\19cProCredential\19cSQLWorkshop\sample_schema.sql
+Add an exercises + solutions file per lesson (example format)
+Produce a one‑page cheat sheet Markdown file
+Which of the above should I create first?
+
+GPT-5 mini • 1x
+
 These 10 AI prompts replaced my entire study routine (and saved me a lot of money)
 After burning through subscription after subscription, I realized I was paying for what AI could do better.
 
