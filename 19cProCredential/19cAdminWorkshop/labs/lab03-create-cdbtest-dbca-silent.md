@@ -200,7 +200,86 @@ Once the script completes successfully:
    - The root open in `READ WRITE`
    - Only the seed PDB (`PDB$SEED`) present (no additional user PDBs yet)
 
-4. Exit SQL*Plus:
+4. Leave the session open for some deeper checks in the next section, or exit now if you prefer and reconnect later.
+
+---
+
+## 7. Deep‑Dive Verification (Files, Tablespaces, EM Express Port)
+
+The lab guide also walks you through checking that DBCA put things **exactly** where you asked it to. This is where we confirm that.
+
+> If you exited SQL*Plus in the previous step, reconnect first:
+>
+> ```bash
+> . oraenv    # when prompted, enter CDBTEST (case‑sensitive)
+> sqlplus / as sysdba
+> ```
+
+1. **Confirm again that `CDBTEST` is a container database**
+
+   ```sql
+   SELECT cdb FROM v$database;
+   ```
+
+   You should see:
+
+   ```text
+   CDB
+   ---
+   YES
+   ```
+
+2. **Verify datafile locations**
+
+   Set a wider display and list the datafiles:
+
+   ```sql
+   COLUMN name FORMAT A80
+   SELECT name
+   FROM   v$datafile
+   ORDER  BY 1;
+   ```
+
+   Check that:
+
+   - The paths match the Oracle Managed Files location from the lab instructions
+   - You see the expected number of files (for example, 7 datafiles as shown in the guide)
+
+3. **Verify tablespaces**
+
+   ```sql
+   SELECT tablespace_name,
+          contents
+   FROM   dba_tablespaces
+   ORDER  BY tablespace_name;
+   ```
+
+   You should see at least:
+
+   - `SYSTEM`
+   - `SYSAUX`
+   - `UNDOTBS` (or similar undo tablespace name from the script)
+   - `TEMP`
+   - `USERS`
+
+4. **Verify the EM Express HTTPS port**
+
+   The script configured EM Express on port `5502`. Confirm with:
+
+   ```sql
+   SELECT DBMS_XDB_CONFIG.gethttpsport AS https_port
+   FROM   dual;
+   ```
+
+   You should see:
+
+   ```text
+   HTTPS_PORT
+   ----------
+        5502
+   ```
+
+5. Now exit SQL*Plus:
 
    ```sql
    EXIT;
@@ -208,7 +287,7 @@ Once the script completes successfully:
 
 ---
 
-## 7. What You Just Achieved (Without Typing `CREATE DATABASE`)
+## 8. What You Just Achieved (Without Typing `CREATE DATABASE`)
 
 By the end of this lab you:
 
@@ -221,4 +300,3 @@ By the end of this lab you:
   - Only the root and seed PDB exist (no extra PDBs yet)
 
 In other words, you now have **two** databases on the host and still have not typed a single multi‑screen `CREATE DATABASE` statement. That is exactly how it should be.
-
