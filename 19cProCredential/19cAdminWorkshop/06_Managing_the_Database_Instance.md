@@ -424,10 +424,11 @@ In short, you now have enough insight to stop treating the instance as a mysteri
 
 ---
 
-## Lab 6 Links
+## Lab 6 Link
 
 When you are ready to practice this in the lab environment, use:
 
-- - [Lab 6-1 - Initialization Parameters and the SPFILE/PFILE Search Game](labs/lab06-initialization-parameters-and-spfile-search.md)
-- [Lab 6-2 - Viewing Parameters and Parameter Views with SQL*Plus](labs/lab06-2-view-parameters-with-sqlplus.md)
+- [Lab 6 – Initialization Parameters and the SPFILE/PFILE Search Game](labs/lab06-initialization-parameters-and-spfile-search.md)
+
+- [Lab 6‑1 – Viewing Parameters with SQL*Plus](labs/lab06-2-view-parameters-with-sqlplus.md)
 
