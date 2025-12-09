@@ -422,3 +422,12 @@ By now you should be able to:
 
 In short, you now have enough insight to stop treating the instance as a mysterious black box and start treating it like a system you can interrogate, tune, and, when necessary, gently shame into behaving better.
 
+---
+
+## Lab 6 Links
+
+When you are ready to practice this in the lab environment, use:
+
+- - [Lab 6-1 - Initialization Parameters and the SPFILE/PFILE Search Game](labs/lab06-initialization-parameters-and-spfile-search.md)
+- [Lab 6-2 - Viewing Parameters and Parameter Views with SQL*Plus](labs/lab06-2-view-parameters-with-sqlplus.md)
+
