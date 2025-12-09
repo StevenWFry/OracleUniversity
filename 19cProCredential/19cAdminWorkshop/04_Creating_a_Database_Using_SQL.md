@@ -299,3 +299,11 @@ By now you should be able to:
 
 You also know why DBAs tend to let DBCA generate this monster for them and only drop down to SQL when they absolutely have to. But if you *do* have to, you now have a plan instead of a headache.
 
+---
+
+## Lab 4 Link
+
+When you are ready to practice this in the lab environment, use:
+
+- [Lab 4 – Creating `CDBDEV` with Raw SQL](labs/lab04-create-cdbdev-sql.md)
+
