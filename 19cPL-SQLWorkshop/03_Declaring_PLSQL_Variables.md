@@ -91,23 +91,137 @@ Consistency is more important than any specific prefix, but choose one and stick
 
 ## 5. Common Data Types (the cast of characters)
 
-**Character types**
+In PL/SQL, you almost always use a small set of core types over and over. Knowing when to pick which one saves you from weird truncation, rounding, and “why is this `NULL` again?” moments.
 
-- `CHAR`, `VARCHAR2`, `NCHAR`, `NVARCHAR2`, `CLOB`, `NCLOB`
+### 5.1 Character types (text and more text)
 
-**Numeric types**
+Use these for names, codes, messages, and anything not meant for arithmetic.
 
-- `NUMBER`, `PLS_INTEGER`, `SIMPLE_INTEGER`, `BINARY_INTEGER`, `BINARY_FLOAT`, `BINARY_DOUBLE`
+- `VARCHAR2(size)`
+  - Variable-length character data up to 32,767 bytes in PL/SQL.
+  - Best general-purpose string type for most columns and variables.
+  - If the value is shorter than `size`, it only uses the needed space.
+  - Example:
+    ```sql
+    v_first_name VARCHAR2(50) := 'Steven';
+    ```
 
-**Boolean**
+- `CHAR(size)`
+  - Fixed-length character data.
+  - Pads with spaces up to `size`, which can cause subtle comparison issues.
+  - Use only when you truly want fixed-width data (e.g., fixed codes).
+  - Example:
+    ```sql
+    v_region_code CHAR(2) := 'US';
+    ```
 
-- `BOOLEAN` with values `TRUE`, `FALSE`, or `NULL`
+- `NCHAR(size)` / `NVARCHAR2(size)`
+  - Unicode character data (national character set).
+  - Use when you must support multilingual data with different character sets.
+  - `NCHAR` is fixed-length; `NVARCHAR2` is variable-length.
 
-**Date and time**
+- `CLOB` / `NCLOB`
+  - Character Large Objects: very large text (documents, logs, etc.).
+  - Not commonly used in simple PL/SQL variables in this course, but crucial for big text in real systems.
+  - Example:
+    ```sql
+    v_big_text CLOB;
+    ```
 
-- `DATE`, `TIMESTAMP`, `TIMESTAMP WITH TIME ZONE`, `INTERVAL YEAR TO MONTH`, `INTERVAL DAY TO SECOND`
+### 5.2 Numeric types (for counting, calculating, and overthinking)
+
+Pick a numeric type based on how exact you need to be and whether you care about performance in tight loops.
+
+- `NUMBER(p, s)`
+  - The “do almost anything” numeric type.
+  - `p` = precision (total digits), `s` = scale (digits to the right of decimal).
+  - Great for money, quantities, percentages.
+  - Example:
+    ```sql
+    v_salary NUMBER(8, 2) := 4500.50;   -- up to 999,999.99
+    ```
+
+- `PLS_INTEGER`
+  - Signed integer; stored in machine-native format.
+  - Very fast in pure PL/SQL arithmetic and loops.
+  - Only for whole numbers (no decimals).
+  - Example:
+    ```sql
+    v_counter PLS_INTEGER := 0;
+    ```
+
+- `SIMPLE_INTEGER`
+  - Like `PLS_INTEGER` but:
+    - Cannot be `NULL`.
+    - No overflow checks (wraps around), which can be faster but dangerous.
+  - Good for performance-critical, well-controlled loops.
+
+- `BINARY_INTEGER`
+  - Older integer type; still works but mostly replaced by `PLS_INTEGER`.
+  - You will see it in legacy code.
+
+- `BINARY_FLOAT` / `BINARY_DOUBLE`
+  - IEEE floating-point types (approximate values).
+  - Good for scientific/engineering calculations where tiny rounding is acceptable.
+  - Not ideal for money, because 0.1 + 0.2 may not be exactly 0.3.
+
+### 5.3 Boolean (true, false, and “I refuse to answer”)
+
+- `BOOLEAN`
+  - Can be `TRUE`, `FALSE`, or `NULL`.
+  - Only exists in PL/SQL (you cannot have a `BOOLEAN` table column).
+  - Great for conditions and branching logic.
+  - Example:
+    ```sql
+    v_is_active BOOLEAN := TRUE;
+    ```
+
+### 5.4 Date and time types (when did this happen?)
+
+- `DATE`
+  - Stores date and time (down to the second).
+  - Most common type for general “when” information.
+  - Example:
+    ```sql
+    v_hiredate DATE := SYSDATE;
+    ```
+
+- `TIMESTAMP`
+  - Like `DATE` but with fractional seconds (up to 9 digits).
+  - Use when you care about sub-second precision.
+  - Example:
+    ```sql
+    v_created_at TIMESTAMP := SYSTIMESTAMP;
+    ```
+
+- `TIMESTAMP WITH TIME ZONE`
+  - `TIMESTAMP` plus stored time zone.
+  - Useful for distributed/global applications where “local time” is not enough.
+
+- `TIMESTAMP WITH LOCAL TIME ZONE`
+  - Stored in the database in a normalized time zone; displayed in the user’s session time zone.
+  - Handy when users are all over the planet but you want sane display behavior.
+
+- `INTERVAL YEAR TO MONTH`
+  - A span of years and months (e.g., “3 years, 2 months”).
+  - Good for things like contract durations or seniority.
+  - Example:
+    ```sql
+    v_duration INTERVAL YEAR TO MONTH := INTERVAL '2-6' YEAR TO MONTH; -- 2 years 6 months
+    ```
+
+- `INTERVAL DAY TO SECOND`
+  - A span of days, hours, minutes, seconds, and fractional seconds.
+  - Great for measuring elapsed time between events.
+  - Example:
+    ```sql
+    v_elapsed INTERVAL DAY TO SECOND := INTERVAL '5 12:30:00' DAY TO SECOND;
+    ```
 
 ---
+
+In real PL/SQL programs, you will often avoid hard-coding these types and instead use `%TYPE` or `%ROWTYPE` to match table columns—but understanding the underlying types gives you a fighting chance when things go weird.
+
 
 ## 6. Initializing with Assignment or DEFAULT (two flavors, same dessert)
 
