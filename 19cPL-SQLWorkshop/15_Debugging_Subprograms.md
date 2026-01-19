@@ -10,6 +10,20 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 13, with fewer screenshots)
+
+In the Student Guide, this is **Lesson 13: Debugging Subprograms**. The agenda there walks through:
+
+- What you need before debugging (privileges, ACLs)
+- Compiling subprograms for debug
+- Using breakpoints, stepping, and the various debugger windows
+- Inspecting and modifying variables
+- Remote debugging basics
+
+This chapter is the same content with less clicking and more commentary, and your lab is the hands‑on counterpart to **Activity Guide Practice 13**, where you build `EMP_LIST` and `GET_LOCATION`, set breakpoints, and walk through the first few iterations in SQL Developer.
+
+---
+
 ## 1. Required Privileges (because debugging is gated)
 
 To debug PL/SQL, you need:

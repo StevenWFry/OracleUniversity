@@ -60,7 +60,7 @@ Yes, scope is petty and unforgiving.
 
 ## 3. Resume the Session
 
-If you opened a new session, run `lab_03_05_solution.sql` (or your saved script from Lesson 3) to recreate the bind variables.
+If you opened a new session, run `lab_03_05_soln.sql` (or your saved script from Lesson 3) to recreate the bind variables, just as the Activity Guide describes.
 
 ---
 
@@ -98,7 +98,7 @@ END;
 
 Save as:
 
-- `lab0403solution.sql`
+- `lab_04_03_soln.sql`
 
 Run the script and confirm output:
 

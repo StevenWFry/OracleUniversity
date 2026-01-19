@@ -12,6 +12,20 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 6, but with jokes)
+
+In the Student Guide, this is **Lesson 6: Writing Control Structures**. The agenda there walks through:
+
+- PL/SQL control structures in general
+- IF / ELSIF / ELSE and how NULL behaves in conditions
+- CASE expressions vs CASE statements
+- LOOP, WHILE, and FOR loops (including rules and examples)
+- Nested loops, labels, and the `CONTINUE` statement
+
+Everything you do in this chapter lines up with that structure and feeds directly into **Activity Guide Practice 6**, where you build real IFs and loops instead of just admiring them on slides.
+
+---
+
 ## 1. IF Statements (the polite bouncer)
 
 If the condition is true, the code runs. If it is not, it does not. That is the deal.

@@ -12,6 +12,20 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 14, no bullet animations)
+
+In the Student Guide, this is **Lesson 14: Creating Packages**. The agenda covers:
+
+- What packages are and why to use them
+- Package components: specification vs body
+- Creating specs and bodies (including via SQL Developer)
+- Public vs private constructs and bodiless packages
+- Viewing and dropping packages
+
+Everything in this chapter mirrors that flow, and the lab lines up with **Activity Guide Practice 14**, where you create `JOB_PKG` and `EMP_PKG` and move standalone procedures/functions into them.
+
+---
+
 ## 1. What Is a Package?
 
 A package is a **schema object** that groups related PL/SQL types, variables, constants, cursors, and subprograms. You already use one: `DBMS_OUTPUT`.

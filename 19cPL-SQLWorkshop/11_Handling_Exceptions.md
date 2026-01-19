@@ -13,6 +13,22 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 9, aka “things go wrong”)
+
+In the Student Guide, this material is **Lesson 9: Handling Exceptions**. The agenda walks through:
+
+- What exceptions are and why they matter
+- Exception types: predefined, non-predefined, and user-defined
+- Syntax and guidelines for exception sections
+- Trapping predefined and non-predefined exceptions
+- Functions for trapping exceptions (`SQLCODE`, `SQLERRM`)
+- User-defined exceptions and `RAISE`
+- Propagation and `RAISE_APPLICATION_ERROR`
+
+The examples here line up with that structure and lead straight into **Activity Guide Practice 9**, where you handle `NO_DATA_FOUND`, `TOO_MANY_ROWS`, and “everything else” while logging to the `MESSAGES` table.
+
+---
+
 ## 1. What Is an Exception?
 
 An exception is a runtime error that stops normal execution.

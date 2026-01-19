@@ -39,6 +39,22 @@ The variable holds one value (salary) so you can reuse it without re-querying li
 
 ---
 
+## 1a. Where This Lesson Fits (Student Guide lesson 3 in disguise)
+
+In the Student Guide, this is **Lesson 3: Declaring PL/SQL Variables**. The official slide list includes:
+
+- What variables are
+- Requirements for variable names
+- Declaring and initializing variables (including from a `SELECT`)
+- Common data types and conversion
+- The `%TYPE` attribute
+- Declaring Booleans
+- Bind variables
+
+Everything you are doing here lines up with that sequence; we just add more sarcasm and fewer bullet transitions.
+
+---
+
 ## 2. Naming Rules (the law, but with more semicolons)
 
 A variable name:
@@ -71,6 +87,37 @@ Rules to remember:
 - `NOT NULL` variables must be initialized
 - `CONSTANT` variables must be initialized and cannot be reassigned
 - Use meaningful names (do not name your variable `employee_id` if it stores a column called `employee_id`, unless you enjoy confusion as a lifestyle)
+
+---
+
+## 3a. Initializing Variables from a SELECT (because the Student Guide really loves this pattern)
+
+The Student Guide explicitly calls out initializing variables with a `SELECT` as a separate agenda item, so let’s make it painfully clear.
+
+You can set a variable directly from a query:
+
+```sql
+DECLARE
+  v_hiredate  employees.hire_date%TYPE;
+  v_employee  employees.employee_id%TYPE := 100;
+BEGIN
+  SELECT hire_date
+  INTO   v_hiredate
+  FROM   employees
+  WHERE  employee_id = v_employee;
+
+  DBMS_OUTPUT.PUT_LINE('Hire date is: ' || v_hiredate);
+END;
+/
+```
+
+Key Student-Guide-aligned rules:
+
+- `SELECT ... INTO` must return exactly **one** row.
+- If it returns **none**, you get `NO_DATA_FOUND`.
+- If it returns **many**, you get `TOO_MANY_ROWS`.
+
+So yes, this is powerful, but you still need a reasonably well-behaved `WHERE` clause.
 
 ---
 
@@ -220,7 +267,38 @@ Pick a numeric type based on how exact you need to be and whether you care about
 
 ---
 
-In real PL/SQL programs, you will often avoid hard-coding these types and instead use `%TYPE` or `%ROWTYPE` to match table columns—but understanding the underlying types gives you a fighting chance when things go weird.
+In real PL/SQL programs, you will often avoid hard-coding these types and instead use `%TYPE` or `%ROWTYPE` to match table columns-but understanding the underlying types gives you a fighting chance when things go weird.
+
+---
+
+## 5.5 Data Type Conversion (PL/SQL’s “are you sure?” moment)
+
+The Student Guide has an entire mini-section on conversion, because mixing types can either “just work” or wreck your index usage and your mood.
+
+Two flavors:
+
+- **Implicit conversion**
+  - Oracle guesses how to convert between character and numeric/date types.
+  - Example: comparing a `NUMBER` column to a string `'100'`.
+  - Works… until it does not, and your query plan goes on strike.
+
+- **Explicit conversion**
+  - You tell Oracle exactly what you want.
+  - `TO_CHAR`, `TO_NUMBER`, `TO_DATE`, `CAST`, etc.
+
+Examples:
+
+```sql
+v_total    NUMBER;
+v_label    VARCHAR2(20);
+v_due_date DATE;
+
+v_total    := TO_NUMBER('1500.75', '9999D99');
+v_label    := TO_CHAR(v_total, '9999D99');
+v_due_date := TO_DATE('2025-12-31', 'YYYY-MM-DD');
+```
+
+Student Guide moral: **prefer explicit conversions**, especially in WHERE clauses and when dates are involved. Future you will thank you. Or at least swear slightly less.
 
 
 ## 6. Initializing with Assignment or DEFAULT (two flavors, same dessert)
@@ -294,6 +372,75 @@ Benefits:
 - Automatically stays in sync if the column changes
 - Reduces maintenance and errors
 - Saves you from quietly drifting into a type mismatch crisis
+
+---
+
+## 9a. Boolean Variables (yes, PL/SQL has them, no, SQL does not)
+
+The Student Guide gives Boolean variables their own call-out:
+
+- `BOOLEAN` can be `TRUE`, `FALSE`, or `NULL`.
+- You can declare them with `%TYPE` too (for example, from a Boolean function parameter).
+- They **cannot** be table columns and are **not** directly visible to SQL.
+
+Example:
+
+```sql
+DECLARE
+  v_is_valid  BOOLEAN := TRUE;
+  v_has_value BOOLEAN;
+BEGIN
+  IF v_is_valid THEN
+    DBMS_OUTPUT.PUT_LINE('All good here.');
+  END IF;
+
+  IF v_has_value IS NULL THEN
+    DBMS_OUTPUT.PUT_LINE('This one is still undecided.');
+  END IF;
+END;
+/
+```
+
+Think of `BOOLEAN` as “PL/SQL internal politics” – extremely useful inside your code, never exposed directly in the tables.
+
+---
+
+## 9b. Bind Variables (your Activity Guide’s favorite party trick)
+
+The end of the Student Guide lesson and **Activity Guide Practice 3** both lean hard into bind variables.
+
+Bind variables:
+
+- Are defined in the client tool (SQL*Plus, SQLcl, SQL Developer).
+- Start with `VARIABLE` when you create them.
+- Are referenced in PL/SQL as `:name`.
+- Can be printed with `PRINT` (or `AUTOPRINT` in some tools).
+
+Example that matches your lab:
+
+```sql
+VARIABLE b_basic_percent NUMBER
+VARIABLE b_pf_percent    NUMBER
+
+DECLARE
+  v_today    DATE := SYSDATE;
+  v_tomorrow v_today%TYPE;
+BEGIN
+  v_tomorrow        := v_today + 1;
+  :b_basic_percent  := 45;
+  :b_pf_percent     := 12;
+
+  DBMS_OUTPUT.PUT_LINE('Hello World');
+  DBMS_OUTPUT.PUT_LINE('Today is: ' || v_today);
+  DBMS_OUTPUT.PUT_LINE('Tomorrow is: ' || v_tomorrow);
+END;
+/
+
+PRINT b_basic_percent
+PRINT b_pf_percent
+```
+
+This is exactly the flow you implement in `lab_03_04_soln.sql` and `lab_03_05_soln.sql` in the Activity Guide, just with more commentary and fewer copyright notices.
 
 ---
 

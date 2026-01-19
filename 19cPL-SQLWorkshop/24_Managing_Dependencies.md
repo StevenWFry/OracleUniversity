@@ -11,6 +11,20 @@ After completing this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 22: managing dependencies)
+
+In the Student Guide, this is **Lesson 22: Managing Dependencies in Your Schema**. The agenda covers:
+
+- Direct vs indirect dependencies and how to display them
+- Fine-grained dependency management (less unnecessary invalidation)
+- Guidelines for reducing invalidations and object revalidation
+- Managing remote dependencies (`REMOTE_DEPENDENCIES_MODE`, timestamp vs signature)
+- Recompiling PL/SQL units and understanding how invalid/valid states change
+
+The sections that follow mirror that structure, and your lab is the implementation of **Activity Guide Practice 22**, where you use `DEPTREE_FILL`/`IDEPTREE` to explore dependencies and then extend `COMPILE_PKG` so you can recompile invalid objects with dynamic SQL.
+
+---
+
 ## Schema Object Dependencies
 
 A dependency exists when one object relies on another for its definition. Examples:

@@ -12,6 +12,24 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lessons 10–12 in one comfy bundle)
+
+In the Student Guide, this topic starts as **Lesson 10: Introducing Stored Procedures and Functions**, then continues in:
+
+- Lesson 11: Creating Procedures (syntax, creation, compilation, parameter modes)
+- Lesson 12: Creating Functions (syntax, SQL usage, side-effect guidelines)
+
+This chapter gives you the “single-slide” version:
+
+- What subprograms are and why we use them instead of endless anonymous blocks
+- How to create and call a simple procedure
+- How to create and call a simple function (including from SQL)
+- How to pass parameters and explain the procedure vs function role split
+
+The lab ties directly to **Activity Guide Practice 10**, where you convert an anonymous block into `greet`, then upgrade it to accept a name.
+
+---
+
 ## 1. What Are Subprograms?
 
 A subprogram is a **named PL/SQL block** stored in the database. It can be called with or without parameters and comes in two main flavors:

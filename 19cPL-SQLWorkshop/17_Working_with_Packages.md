@@ -11,6 +11,20 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 15, advanced packages)
+
+In the Student Guide, this is **Lesson 15: Working with Packages**. The agenda there covers:
+
+- Why overload subprograms and how to do it safely
+- Restrictions on overloading and interactions with defaults
+- Package instantiation and initialization blocks
+- Package state and `PRAGMA SERIALLY_REUSABLE`
+- Using user-defined package functions in SQL
+
+This chapter hits the same points, and your lab is the hands‑on equivalent of **Activity Guide Practice 15**, where you overload `ADD_EMPLOYEE` and `GET_EMPLOYEE`, add a `PRINT_EMPLOYEE` helper, create an initialization routine and persistent department table, and use a forward declaration to keep the compiler from panicking.
+
+---
+
 ## 1. Overloading (same name, different signature)
 
 Overloading lets you create multiple subprograms with the same name, as long as the parameter list differs in **number, order, or data type family**.

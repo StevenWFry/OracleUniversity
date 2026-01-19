@@ -13,6 +13,21 @@ After completing this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 20: design considerations)
+
+In the Student Guide, this is **Lesson 20: Design Considerations for PL/SQL Code**. The agenda there walks through:
+
+- Standardizing constants, exceptions, and exception handling
+- Local subprograms
+- Definer’s vs invoker’s rights, including `AUTHID CURRENT_USER`
+- Autonomous transactions
+- Performance hints: `NOCOPY`, `PARALLEL_ENABLE`, `RESULT_CACHE`, `DETERMINISTIC`
+- `RETURNING` and bulk binding (`FORALL`, `BULK COLLECT`)
+
+The material that follows mirrors that list, and your lab is the practical piece of **Activity Guide Practice 20**, where you bulk-fetch employees into a package-level collection and log new employees with an autonomous transaction.
+
+---
+
 ## Standardizing Code
 
 Standardization:

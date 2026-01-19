@@ -6,7 +6,7 @@ You will:
 
 - Identify which PL/SQL blocks execute successfully
 - Create and run a simple block that outputs `Hello World`
-- Save the script to the lab folder
+- Save the script to the lab folder using the same naming the Activity Guide uses
 
 ---
 
@@ -14,11 +14,11 @@ You will:
 
 Working directory:
 
-- `home/oracle/labs/plsf`
+- `/home/oracle/labs/plsf/labs`
 
 Solutions directory:
 
-- `home/oracle/labs/plsfsoln`
+- `/home/oracle/labs/plsf/soln`
 
 You will save your scripts in the labs folder and compare with the solutions when needed.
 
@@ -26,51 +26,53 @@ You will save your scripts in the labs folder and compare with the solutions whe
 
 ## 2. Which Blocks Run? (the survival test)
 
-Try each block in a worksheet and see what happens.
+Try each block from the Activity Guide in a worksheet and see what happens.
 
-**A. This runs**
+**A**
 
 ```sql
 BEGIN
-  NULL;
+  COMMIT;
 END;
 /
 ```
 
-**B. This fails** (missing `BEGIN` and executable section)
+**B**
 
 ```sql
 DECLARE
-  v_test NUMBER;
+  v_amount INTEGER(10);
 END;
 /
 ```
 
-**C. This fails** (has `DECLARE` and `BEGIN`, but no executable statement)
+**C**
 
 ```sql
 DECLARE
-  v_test NUMBER;
 BEGIN
 END;
 /
 ```
 
-**D. This runs** (but prints nothing because the variable is not initialized)
+**D**
 
 ```sql
+SET SERVEROUTPUT ON;
+
 DECLARE
-  v_test VARCHAR2(20);
+  v_amount INTEGER(10);
 BEGIN
-  DBMS_OUTPUT.PUT_LINE(v_test);
+  DBMS_OUTPUT.PUT_LINE(v_amount);
 END;
 /
 ```
 
-Summary:
+According to the official Activity Guide commentary (and also reality):
 
 - **A and D** execute successfully
-- **B and C** fail because the executable section is missing or empty
+- **B** fails because the executable section is missing
+- **C** technically has `DECLARE` and `BEGIN`, but with no executable statement the block is invalid in this form
 
 ---
 
@@ -93,13 +95,10 @@ Run it as a script (`F5`). You should see the output.
 
 ## 4. Save the Script
 
-Save your script as:
+Save your script using the same naming as the Activity Guide:
 
-- `lab22solution.sql`
-
-Suggested location:
-
-- `home/oracle/labs/plsf`
+- File name: `lab_02_02_soln.sql`
+- Location: `/home/oracle/labs/plsf/labs`
 
 ---
 

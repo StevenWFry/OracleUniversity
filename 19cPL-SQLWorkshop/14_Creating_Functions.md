@@ -13,6 +13,21 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 12, with fewer slides)
+
+In the Student Guide, this lines up with **Lesson 12: Creating Functions**. The agenda there covers:
+
+- What functions are and how they differ from procedures
+- Function syntax and creation (including SQL Developer support)
+- Invoking stored functions from PL/SQL and SQL
+- Restrictions and side-effect rules for functions in SQL
+- Guidelines for controlling side effects
+- Viewing and dropping functions
+
+Everything below maps to that sequence, and the lab connects straight to **Activity Guide Practice 12**, where you create `GET_JOB`, `GET_ANNUAL_COMP`, a `VALID_DEPTID` Boolean function, and an `ADD_EMPLOYEE` procedure that calls it.
+
+---
+
 ## 1. What Is a Function?
 
 A function is a **named PL/SQL block** that:

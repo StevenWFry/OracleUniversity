@@ -12,6 +12,20 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 7, no bullet animations)
+
+In the Student Guide, this corresponds to **Lesson 7: Working with Composite Data Types**. The official agenda walks through:
+
+- Composite data types and “records vs collections”
+- PL/SQL records and `%ROWTYPE`
+- Inserting and updating rows using records
+- Associative arrays (INDEX BY tables), including records
+- Collection methods and a quick nod to nested tables and varrays
+
+The examples and labs here are the same ones referenced in **Activity Guide Practice 7**, where you build `%ROWTYPE` records for `COUNTRIES`, then associative arrays of `DEPARTMENTS` rows.
+
+---
+
 ## 1. Composite Data Types (more than one value, finally)
 
 Composite types store multiple values in a single structure:

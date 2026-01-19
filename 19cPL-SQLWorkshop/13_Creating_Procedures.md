@@ -14,6 +14,20 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 11, but with jokes)
+
+In the Student Guide, this corresponds to **Lesson 11: Creating Procedures**. The agenda there walks through:
+
+- Why modularize PL/SQL code and what subprograms are
+- Procedure syntax, creation, and compilation (including via SQL Developer)
+- Parameters and parameter modes (`IN`, `OUT`, `IN OUT`), formal vs actual
+- Positional, named, and mixed notation (with rules for mixing)
+- Handling exceptions inside procedures and dropping/viewing them
+
+This chapter hits those same beats, then your labs pick up with **Activity Guide Practice 11-1** (new SQL Developer connection) and 11-2 (creating and using `ADD_JOB`, `UPD_JOB`, `DEL_JOB`, and `GET_EMPLOYEE` with `RAISE_APPLICATION_ERROR` and OUT parameters).
+
+---
+
 ## 1. Why Modularize?
 
 Modularization means breaking large tasks into smaller, reusable modules. Benefits include:

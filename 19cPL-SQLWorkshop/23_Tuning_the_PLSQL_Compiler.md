@@ -9,6 +9,19 @@ After completing this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 21: tuning the compiler)
+
+In the Student Guide, this matches **Lesson 21: Tuning the PL/SQL Compiler**. The agenda covers:
+
+- Initialization parameters for PL/SQL compilation (`PLSQL_CODE_TYPE`, `PLSQL_OPTIMIZE_LEVEL`)
+- Viewing and changing compilation settings
+- Compile-time warnings: categories, enabling/disabling, elevating to errors
+- Using the `PLSQL_WARNINGS` parameter and the `DBMS_WARNING` package
+
+The sections below align with those topics, and the lab implements **Activity Guide Practice 21**, where you flip native/interpreted modes, toggle warnings, compile a procedure that generates warnings, and then classify warnings using `DBMS_WARNING`.
+
+---
+
 ## Compiler Initialization Parameters
 
 The compiler rearranges code for performance. You control it with initialization parameters. The two most important for this course:
