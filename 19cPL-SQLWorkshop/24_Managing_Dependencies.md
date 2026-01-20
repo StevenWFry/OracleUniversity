@@ -42,6 +42,16 @@ Indirect dependencies:
 
 Changing Object C can invalidate Object A, even if A never mentioned C directly.
 
+Tiny demo:
+
+```sql
+CREATE OR REPLACE VIEW emp_names_v AS
+  SELECT employee_id, last_name
+  FROM employees;
+
+-- EMP_NAMES_V now depends on EMPLOYEES
+```
+
 ---
 
 ## Tracking Dependencies
@@ -61,6 +71,16 @@ For a full tree (including indirect):
 
 If you like visual trees, `IDEPTREE` is your friend.
 
+Quick example of querying dependencies for a view:
+
+```sql
+SELECT referenced_owner,
+       referenced_name,
+       referenced_type
+FROM   user_dependencies
+WHERE  name = 'EMP_NAMES_V';
+```
+
 ---
 
 ## Object Status Values
@@ -73,6 +93,14 @@ Objects can be:
 - `UNAUTHORIZED`
 
 Only dependent objects become INVALID or UNAUTHORIZED. The referenced object is innocent. It just changed its hair.
+
+You can check status in `USER_OBJECTS`:
+
+```sql
+SELECT object_name, object_type, status
+FROM   user_objects
+WHERE  object_name IN ('EMPLOYEES', 'EMP_NAMES_V');
+```
 
 ---
 
@@ -107,6 +135,18 @@ Modes:
 Timestamp checks invalidation if the remote object was recompiled.
 Signature checks only invalidate if the interface changed.
 
+Example of changing the mode at the session level before calling remote code:
+
+```sql
+ALTER SESSION SET remote_dependencies_mode = signature;
+
+-- call a remote procedure over a database link
+BEGIN
+  remote_pkg.do_something@hr_link;
+END;
+/ 
+```
+
 ---
 
 ## Recompiling Objects
@@ -122,6 +162,22 @@ You can also force it:
 ```sql
 ALTER PROCEDURE my_proc COMPILE;
 ALTER PACKAGE my_pkg COMPILE;
+```
+
+To recompile everything invalid in your schema:
+
+```sql
+BEGIN
+  FOR r IN (
+    SELECT object_name, object_type
+    FROM   user_objects
+    WHERE  status = 'INVALID'
+  ) LOOP
+    EXECUTE IMMEDIATE
+      'ALTER ' || r.object_type || ' ' || r.object_name || ' COMPILE';
+  END LOOP;
+END;
+/ 
 ```
 
 ---

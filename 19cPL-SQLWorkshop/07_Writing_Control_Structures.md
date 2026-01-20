@@ -249,6 +249,43 @@ Given:
 
 Loop inserts three new locations: 1901, 1902, 1903, then reports 3 rows added. This is a loop doing exactly what you expect, which is rare and should be celebrated.
 
+Example in the HR sample schema:
+
+```sql
+DECLARE
+  v_country_id    locations.country_id%TYPE    := 'CA';
+  v_max_loc_id    locations.location_id%TYPE;
+  v_rows_inserted PLS_INTEGER                  := 0;
+BEGIN
+  -- Find the current maximum location_id for this country
+  SELECT MAX(location_id)
+  INTO v_max_loc_id
+  FROM locations
+  WHERE country_id = v_country_id;
+
+  -- Insert three new locations with consecutive IDs
+  FOR l_loc_id IN v_max_loc_id + 1 .. v_max_loc_id + 3 LOOP
+    INSERT INTO locations (location_id,
+                           street_address,
+                           postal_code,
+                           city,
+                           state_province,
+                           country_id)
+    VALUES (l_loc_id,
+            'New Canadian office ' || l_loc_id,
+            'N/A',
+            'Somewhere',
+            'Some-Province',
+            v_country_id);
+
+    v_rows_inserted := v_rows_inserted + 1;
+  END LOOP;
+
+  DBMS_OUTPUT.PUT_LINE(v_rows_inserted || ' locations added for country ' || v_country_id);
+END;
+/
+```
+
 ---
 
 ## 7. Wrap-Up

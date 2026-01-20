@@ -41,7 +41,24 @@ Use bodiless packages for:
 - Constants
 - Named exceptions
 
-Example: a standardized error package with named exceptions bound to error codes via `PRAGMA EXCEPTION_INIT`. You define the exception once and reuse it everywhere.
+Example: a standardized error package with named exceptions bound to error codes via `PRAGMA EXCEPTION_INIT`. You define the exception once and reuse it everywhere:
+
+```sql
+CREATE OR REPLACE PACKAGE app_errors IS
+  e_invalid_dept   EXCEPTION;
+  e_negative_salary EXCEPTION;
+
+  PRAGMA EXCEPTION_INIT(e_invalid_dept,   -20001);
+  PRAGMA EXCEPTION_INIT(e_negative_salary, -20002);
+END app_errors;
+/ 
+```
+
+Later, in your procedures and functions:
+
+```sql
+RAISE app_errors.e_invalid_dept;
+```
 
 ---
 
@@ -49,11 +66,33 @@ Example: a standardized error package with named exceptions bound to error codes
 
 You can define a function or procedure inside another subprogram. That local subprogram is only visible inside the parent block.
 
-Example: `employee_sal` declares a local `tax` function and uses it in the executable section. Local subprograms keep helper logic close and private, like a tiny, well-behaved gremlin.
+Example: `employee_sal` declares a local `tax` function and uses it in the executable section. Local subprograms keep helper logic close and private, like a tiny, well-behaved gremlin:
+
+```sql
+CREATE OR REPLACE PROCEDURE employee_sal (
+  p_emp_id  IN  employees.employee_id%TYPE,
+  p_net_sal OUT employees.salary%TYPE
+) IS
+  -- local helper, only visible inside EMPLOYEE_SAL
+  FUNCTION tax (p_gross employees.salary%TYPE) RETURN NUMBER IS
+  BEGIN
+    RETURN p_gross * 0.2;
+  END tax;
+
+  v_gross employees.salary%TYPE;
+BEGIN
+  SELECT salary INTO v_gross
+  FROM employees
+  WHERE employee_id = p_emp_id;
+
+  p_net_sal := v_gross - tax(v_gross);
+END employee_sal;
+/ 
+```
 
 ---
 
-## Definer’s Rights vs Invoker’s Rights
+## Definer's Rights vs Invoker's Rights
 
 By default, subprograms run with **definer’s rights**.
 
@@ -62,13 +101,29 @@ If you add:
 ```
 AUTHID CURRENT_USER
 ```
+you get **invoker's rights**. That means:
 
-you get **invoker’s rights**. That means:
-
-- Object names resolve in the invoker’s schema
+- Object names resolve in the invoker's schema
 - Privileges come from the user calling the program
 
-Use this when you want reusable code across multiple schemas without forcing everything into one owner’s privileges.
+Use this when you want reusable code across multiple schemas without forcing everything into one owner's privileges.
+
+Minimal example:
+
+```sql
+CREATE OR REPLACE PROCEDURE show_user_objects
+AUTHID CURRENT_USER
+IS
+  v_count PLS_INTEGER;
+BEGIN
+  SELECT COUNT(*)
+  INTO v_count
+  FROM user_objects;
+
+  DBMS_OUTPUT.PUT_LINE('You own ' || v_count || ' objects.');
+END show_user_objects;
+/ 
+```
 
 ---
 
@@ -86,7 +141,23 @@ Typical use:
 - Audit trails
 - Error reporting
 
-If the main transaction fails, the audit log still survives. It is basically your database version of "pics or it didn’t happen."
+Example logging procedure:
+
+```sql
+CREATE OR REPLACE PROCEDURE log_event (
+  p_message IN VARCHAR2
+) IS
+  PRAGMA AUTONOMOUS_TRANSACTION;
+BEGIN
+  INSERT INTO app_log (log_id, log_ts, message)
+  VALUES (app_log_seq.NEXTVAL, SYSTIMESTAMP, p_message);
+
+  COMMIT;  -- required in autonomous transactions
+END log_event;
+/ 
+```
+
+If the main transaction fails, the audit log still survives. It is basically your database version of "pics or it didn't happen."
 
 ---
 
@@ -103,6 +174,24 @@ Benefits:
 
 Downside: if the subprogram fails, you cannot rely on partial values.
 
+```sql
+CREATE OR REPLACE PROCEDURE add_bonus (
+  p_emp_id  IN  employees.employee_id%TYPE,
+  p_bonus   IN OUT NOCOPY NUMBER
+) IS
+BEGIN
+  UPDATE employees
+  SET salary = salary + p_bonus
+  WHERE employee_id = p_emp_id;
+
+  -- reflect the new salary back to the caller
+  SELECT salary INTO p_bonus
+  FROM employees
+  WHERE employee_id = p_emp_id;
+END add_bonus;
+/ 
+```
+
 ### PARALLEL_ENABLE
 
 Lets functions run in parallel queries and DML. Use when the function is safe for parallel execution.
@@ -113,8 +202,23 @@ Caches function results by parameter values in the SGA.
 
 Example:
 
-- Cached results reused across sessions
-- Use `RELIES_ON` for cache invalidation when data changes
+Cached results reused across sessions:
+
+```sql
+CREATE OR REPLACE FUNCTION get_region_name (p_region_id IN regions.region_id%TYPE)
+  RETURN regions.region_name%TYPE
+  RESULT_CACHE
+IS
+  v_name regions.region_name%TYPE;
+BEGIN
+  SELECT region_name INTO v_name
+  FROM regions
+  WHERE region_id = p_region_id;
+
+  RETURN v_name;
+END get_region_name;
+/ 
+```
 
 ### DETERMINISTIC
 
@@ -125,6 +229,19 @@ Tells Oracle that the same inputs always produce the same outputs. Useful for op
 ## RETURNING Clause
 
 Use `RETURNING` in `INSERT`, `UPDATE`, or `DELETE` to avoid a second `SELECT`. One trip to the database is enough; your app does not need to commute twice.
+
+```sql
+DECLARE
+  v_new_id employees.employee_id%TYPE;
+BEGIN
+  INSERT INTO employees (employee_id, last_name, email, hire_date, job_id)
+  VALUES (employees_seq.NEXTVAL, 'Sample', 'SAMPLE', SYSDATE, 'IT_PROG')
+  RETURNING employee_id INTO v_new_id;
+
+  DBMS_OUTPUT.PUT_LINE('New employee id = ' || v_new_id);
+END;
+/ 
+```
 
 ---
 
@@ -143,6 +260,26 @@ Result:
 - Fewer context switches
 - Faster execution
 - Less dramatic waiting
+
+Combined example:
+
+```sql
+DECLARE
+  TYPE t_emp_ids IS TABLE OF employees.employee_id%TYPE;
+  l_emp_ids   t_emp_ids;
+BEGIN
+  SELECT employee_id
+  BULK COLLECT INTO l_emp_ids
+  FROM employees
+  WHERE department_id = 50;
+
+  FORALL i IN l_emp_ids.FIRST .. l_emp_ids.LAST
+    UPDATE employees
+    SET salary = salary * 1.05
+    WHERE employee_id = l_emp_ids(i);
+END;
+/ 
+```
 
 ---
 

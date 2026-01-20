@@ -40,6 +40,16 @@ Code type:
 - `INTERPRETED` (default) for debugging
 - `NATIVE` for performance (often faster)
 
+Quick demo of switching a session to native, high-optimization mode:
+
+```sql
+ALTER SESSION SET plsql_code_type      = native;
+ALTER SESSION SET plsql_optimize_level = 3;
+
+-- Now (re)compile a program unit in this session
+ALTER PROCEDURE demo_proc COMPILE;
+```
+
 ---
 
 ## Where to Set Them
@@ -97,6 +107,17 @@ You can also mark a specific warning as an error:
 ALTER SESSION SET plsql_warnings = 'error:05003';
 ```
 
+Simple procedure that will generate warnings:
+
+```sql
+CREATE OR REPLACE PROCEDURE unreachable_code_demo IS
+BEGIN
+  RETURN;
+  DBMS_OUTPUT.PUT_LINE('You will never see this');  -- PLW-06002
+END unreachable_code_demo;
+/ 
+```
+
 ---
 
 ## DBMS_WARNING Package
@@ -110,6 +131,20 @@ DBMS_WARNING.get_category(7203);
 ```
 
 If you forget what 7203 means, the package will remind you. Politely.
+
+Example in an anonymous block:
+
+```sql
+DECLARE
+  v_settings VARCHAR2(512);
+BEGIN
+  v_settings := DBMS_WARNING.get_warning_setting_string;
+  DBMS_OUTPUT.PUT_LINE('Current settings: ' || v_settings);
+
+  DBMS_WARNING.set_warning_setting_string('enable:severe,enable:performance', 'SESSION');
+END;
+/ 
+```
 
 ---
 

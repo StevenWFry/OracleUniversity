@@ -33,13 +33,36 @@ The Student Guide opens this lesson by pointing out exactly where SQL starts to 
 - SQL statements are **sent one at a time** from the client to the database.
 - SQL on its own has **no variables, no loops, no IF/ELSE**, and no built-in error handling logic.
 
-So if you try to write “check this, then that, then maybe update that other thing” in pure SQL, you end up with:
+So if you try to write "check this, then that, then maybe update that other thing" in pure SQL, you end up with:
 
 - A pile of round-trips between app and database.
 - Business rules scattered across multiple places.
 - No central, versioned, debuggable unit of work.
 
 PL/SQL is the fix: you wrap multiple SQL statements, variables, and logic into a single block and send that to the database as one coherent thought.
+
+Plain SQL from a client (multiple calls):
+
+```sql
+UPDATE employees
+SET salary = salary * 1.05
+WHERE employee_id = 100;
+
+UPDATE employees
+SET salary = salary * 1.05
+WHERE employee_id = 101;
+```
+
+Same idea as one PL/SQL unit of work:
+
+```sql
+BEGIN
+  UPDATE employees
+  SET salary = salary * 1.05
+  WHERE employee_id IN (100, 101);
+END;
+/
+```
 
 ---
 
