@@ -208,6 +208,36 @@ END LOOP;
 
 You cannot reference `i` outside the loop. It is a loaner, not a roommate.
 
+### 5.4 Labeled Loops (when you name your loops)
+
+Labels let you point at a specific loop when you `EXIT` or `CONTINUE`, which is especially useful with nested loops.
+
+Basic label syntax:
+
+```sql
+<<outer_loop>>
+FOR i IN 1..3 LOOP
+  <<inner_loop>>
+  FOR j IN 1..3 LOOP
+    IF j = 2 THEN
+      CONTINUE inner_loop;   -- skip the rest of the inner loop, next j
+    END IF;
+
+    IF i = 3 THEN
+      EXIT outer_loop;       -- leave both loops completely
+    END IF;
+
+    DBMS_OUTPUT.PUT_LINE('i=' || i || ', j=' || j);
+  END LOOP inner_loop;
+END LOOP outer_loop;
+```
+
+Things to notice:
+
+- Labels go before the loop (`<<outer_loop>>`) and can optionally be repeated after `END LOOP outer_loop;`
+- `EXIT outer_loop;` jumps out of that specific loop, even from inside an inner loop
+- `CONTINUE inner_loop;` skips to the next iteration of the labeled loop
+
 ---
 
 ## 6. Example: INSERT with a Loop
