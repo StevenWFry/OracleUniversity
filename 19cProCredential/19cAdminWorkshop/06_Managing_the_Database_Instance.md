@@ -1,6 +1,6 @@
-# 6 – Managing the Database Instance (Taming the Parameter Hydra)
+# 6 - Managing the Database Instance (Taming the Parameter Hydra)
 
-And look, creating a database is fun in a terrifying, ritual‑summoning kind of way. But once it exists, your day‑to‑day job is managing the **instance** that runs it: its parameters, its diagnostics, and its performance views. This is where you stop being a database midwife and start being a database doctor.
+And look, creating a database is fun in a terrifying, ritual-summoning kind of way. But once it exists, your day-to-day job is managing the **instance** that runs it: its parameters, its diagnostics, and its performance views. This is where you stop being a database midwife and start being a database doctor.
 
 This chapter covers:
 
@@ -10,18 +10,25 @@ This chapter covers:
 - The Automatic Diagnostic Repository (ADR) layout and ADRCI
 - Performance views (`V$`, `GV$`) and data dictionary views (`USER_`, `DBA_`, `CDB_`)
 
+By the end of this module, you should be able to:
+
+- Work with initialization parameters and understand their scope
+- Use ADR/ADRCI to inspect diagnostics and alert logs
+- Explain DDL logging and trace file usage
+- Query dynamic performance and data dictionary views
+
 ---
 
 ## 1. Parameter Files: Who Tells the Instance What To Do
 
 When you start an instance, it needs instructions. Those instructions live in **initialization parameter files**:
 
-- **spfile** – server parameter file, binary, database‑managed
-  - Typically named `spfile<SID>.ora`
-  - Lives in `$ORACLE_HOME/dbs` on Linux/UNIX
-- **pfile** – plain text parameter file
-  - Typically named `init<SID>.ora`
-  - Also lives in `$ORACLE_HOME/dbs`
+- **spfile** - server parameter file, binary, database-managed
+ - Typically named `spfile<SID>.ora`
+ - Lives in `$ORACLE_HOME/dbs` on Linux/UNIX
+- **pfile** - plain text parameter file
+ - Typically named `init<SID>.ora`
+ - Also lives in `$ORACLE_HOME/dbs`
 
 DBCA usually:
 
@@ -54,7 +61,7 @@ To see what the instance is actually using, you query:
 
 ```sql
 SELECT name, value
-FROM   v$parameter;
+FROM v$parameter;
 ```
 
 Not the text file on disk.
@@ -67,7 +74,7 @@ You can change many parameters **while the database is running**.
 
 ### 2.1 `ALTER SYSTEM`
 
-Changes the **instance‑level** value for all sessions (or for all sessions in a CDB container, depending on how you connect).
+Changes the **instance-level** value for all sessions (or for all sessions in a CDB container, depending on how you connect).
 
 Basic form:
 
@@ -101,20 +108,20 @@ Useful for:
 Not all parameters are created equal:
 
 - **Dynamic parameters** can be changed while the instance is running
-  - Examples: `open_cursors`, some memory settings, tracing/logging settings
+ - Examples: `open_cursors`, some memory settings, tracing/logging settings
 - **Static parameters** require a restart
-  - Examples: `control_files`, `db_name`, often some memory structures
+ - Examples: `control_files`, `db_name`, often some memory structures
 
 For static parameters:
 
 1. Change them in the spfile:
 
-   ```sql
-   ALTER SYSTEM SET control_files =
-     '/u02/oradata/ORCL/control01.ctl',
-     '/u03/oradata/ORCL/control02.ctl'
-   SCOPE=SPFILE;
-   ```
+ ```sql
+ ALTER SYSTEM SET control_files =
+ '/u02/oradata/ORCL/control01.ctl',
+ '/u03/oradata/ORCL/control02.ctl'
+ SCOPE=SPFILE;
+ ```
 
 2. Shut down the instance
 3. Move/copy the files as needed
@@ -125,13 +132,13 @@ For static parameters:
 `SCOPE` tells Oracle *where* to apply the change:
 
 - `SCOPE=MEMORY`
-  - Change takes effect in the **running instance only**
-  - Does **not** persist across restarts
+ - Change takes effect in the **running instance only**
+ - Does **not** persist across restarts
 - `SCOPE=SPFILE`
-  - Change is written to the **spfile only**
-  - Takes effect **next time** you start the instance
+ - Change is written to the **spfile only**
+ - Takes effect **next time** you start the instance
 - `SCOPE=BOTH`
-  - Change is applied immediately **and** persisted in the spfile
+ - Change is applied immediately **and** persisted in the spfile
 
 Rules:
 
@@ -155,21 +162,21 @@ If you want more control, query it directly:
 
 ```sql
 SELECT name,
-       value,
-       isses_modifiable,
-       issys_modifiable
-FROM   v$parameter
-WHERE  name LIKE 'db_%'
-ORDER  BY name;
+ value,
+ isses_modifiable,
+ issys_modifiable
+FROM v$parameter
+WHERE name LIKE 'db_%'
+ORDER BY name;
 ```
 
-In a multitenant environment, remember there are **CDB‑level** and **PDB‑level** parameter views as well; the lab later goes deeper into that.
+In a multitenant environment, remember there are **CDB-level** and **PDB-level** parameter views as well; the lab later goes deeper into that.
 
 ---
 
 ## 4. The Automatic Diagnostic Repository (ADR)
 
-When something goes wrong, you will inevitably be told to “check the alert log.” In 19c, the alert log and its friends live in the **Automatic Diagnostic Repository** (ADR).
+When something goes wrong, you will inevitably be told to "check the alert log." In 19c, the alert log and its friends live in the **Automatic Diagnostic Repository** (ADR).
 
 ADR is:
 
@@ -180,40 +187,40 @@ General layout:
 
 ```text
 $ORACLE_BASE/diag/rdbms/<db_name>/<instance_name>/
-  alert/
-    log.xml        -- XML alert log
-  cdump/           -- core dumps
-  incident/        -- incident data per ORA error
-  hm/              -- Health Monitor reports
-  trace/
-    alert_<inst>.log   -- text alert log
-    *.trc, *.trm       -- background & session trace files
-  ...
+ alert/
+ log.xml -- XML alert log
+ cdump/ -- core dumps
+ incident/ -- incident data per ORA error
+ hm/ -- Health Monitor reports
+ trace/
+ alert_<inst>.log -- text alert log
+ *.trc, *.trm -- background & session trace files
+ ...
 ```
 
 There is also:
 
 ```text
 $ORACLE_BASE/diag/.../log/
-  ddl/             -- DDL logging (if enabled)
-  debug/           -- debug logging (if enabled)
+ ddl/ -- DDL logging (if enabled)
+ debug/ -- debug logging (if enabled)
 ```
 
 Alerts capture:
 
 - Startup/shutdown events
 - Major structural changes (tablespace create/drop, file offline/online)
-- Significant ORA‑ errors
+- Significant ORA errors
 
 Trace files capture:
 
-- Session‑level tracing information
+- Session-level tracing information
 - Execution plans
 - Wait events / timing data
 
 ---
 
-## 5. ADRCI – Command‑Line Access to ADR
+## 5. ADRCI - Command-Line Access to ADR
 
 `ADRCI` (Automatic Diagnostic Repository Command Interface) is your CLI into ADR:
 
@@ -226,16 +233,16 @@ From the ADRCI prompt you can:
 - See the current ADR home(s)
 - View alert logs:
 
-  ```text
-  adrci> show alert
-  ```
+ ```text
+ adrci> show alert
+ ```
 
 - Inspect incidents and problems:
 
-  ```text
-  adrci> show problem
-  adrci> show incident
-  ```
+ ```text
+ adrci> show problem
+ adrci> show incident
+ ```
 
 - Package diagnostic data for Oracle Support (SRs)
 
@@ -263,11 +270,11 @@ When enabled, they write to:
 Common use cases:
 
 - You are doing a tuning session with many DDL changes:
-  - Enable DDL logging
-  - Later mine the log file for the exact sequence of DDL to replay or clean up
+ - Enable DDL logging
+ - Later mine the log file for the exact sequence of DDL to replay or clean up
 - You are reproducing a tricky ORA error for Oracle Support:
-  - Enable debug logging at a higher level
-  - Capture extra detail for analysis
+ - Enable debug logging at a higher level
+ - Capture extra detail for analysis
 
 And yes, it is entirely possible to turn on so much logging that you fill the filesystem, so use it like hot sauce: sparingly and intentionally.
 
@@ -277,45 +284,45 @@ And yes, it is entirely possible to turn on so much logging that you fill the fi
 
 Oracle maintains a vast collection of **performance views** to tell you what the instance is doing. Under the hood:
 
-- There is an internal “fixed tables” schema (`X$` tables)
+- There is an internal "fixed tables" schema (`X$` tables)
 - On startup, these are created and populated in memory
 - When the instance shuts down, many are dropped; some information is pushed to persistent tables
 
-You usually do **not** query `X$` directly (that’s where dragons live). Instead you use:
+You usually do **not** query `X$` directly (that's where dragons live). Instead you use:
 
-- `V$` views – single‑instance perspective
-- `GV$` views – global (cluster‑wide) view in RAC
+- `V$` views - single-instance perspective
+- `GV$` views - global (cluster-wide) view in RAC
 
 Examples:
 
 - `V$DATABASE`
 
-  ```sql
-  DESC v$database;
+ ```sql
+ DESC v$database;
 
-  SELECT name,
-         cdb,
-         open_mode
-  FROM   v$database;
-  ```
+ SELECT name,
+ cdb,
+ open_mode
+ FROM v$database;
+ ```
 
-  Shows:
+ Shows:
 
-  - Database name
-  - Whether it is a CDB
-  - Current open mode
-  - Control file locations, logging configuration, and more
+ - Database name
+ - Whether it is a CDB
+ - Current open mode
+ - Control file locations, logging configuration, and more
 
 - `V$SESSION`
 
-  ```sql
-  DESC v$session;
-  ```
+ ```sql
+ DESC v$session;
+ ```
 
-  Holds:
+ Holds:
 
-  - One row per session
-  - Session state, wait events, SQL being executed, module names, etc.
+ - One row per session
+ - Session state, wait events, SQL being executed, module names, etc.
 
 These are the raw materials for almost every performance and monitoring tool you will use.
 
@@ -323,43 +330,43 @@ These are the raw materials for almost every performance and monitoring tool you
 
 ## 8. Data Dictionary Views: USER_, ALL_, DBA_, CDB_
 
-Beyond performance, you also need metadata: tables, indexes, users, privileges, etc. That’s the **data dictionary**.
+Beyond performance, you also need metadata: tables, indexes, users, privileges, etc. That's the **data dictionary**.
 
 View families:
 
 - `USER_...`
-  - Objects owned by *you*
-  - Example: `USER_TABLES` – tables you own
+ - Objects owned by *you*
+ - Example: `USER_TABLES` - tables you own
 - `ALL_...`
-  - Objects you can *see* (because you own them or have privileges)
-  - Example: `ALL_TABLES`
+ - Objects you can *see* (because you own them or have privileges)
+ - Example: `ALL_TABLES`
 - `DBA_...`
-  - All objects in the current container, for DBAs
-  - Example: `DBA_TABLESPACES`, `DBA_TABLES`
+ - All objects in the current container, for DBAs
+ - Example: `DBA_TABLESPACES`, `DBA_TABLES`
 - `CDB_...` (CDB only)
-  - All objects across all containers (CDB root + PDBs)
-  - Includes a `CON_ID` column to identify the container
+ - All objects across all containers (CDB root + PDBs)
+ - Includes a `CON_ID` column to identify the container
 
 Examples from the demo:
 
 - Tablespaces in the current container:
 
-  ```sql
-  DESC dba_tablespaces;
+ ```sql
+ DESC dba_tablespaces;
 
-  SELECT tablespace_name
-  FROM   dba_tablespaces
-  ORDER  BY tablespace_name;
-  ```
+ SELECT tablespace_name
+ FROM dba_tablespaces
+ ORDER BY tablespace_name;
+ ```
 
 - Tables across all containers:
 
-  ```sql
-  SELECT tablespace_name,
-         con_id
-  FROM   cdb_tablespaces
-  ORDER  BY con_id, tablespace_name;
-  ```
+ ```sql
+ SELECT tablespace_name,
+ con_id
+ FROM cdb_tablespaces
+ ORDER BY con_id, tablespace_name;
+ ```
 
 Note:
 
@@ -373,37 +380,37 @@ The demo also showed some practical SQL*Plus techniques:
 
 - Setting the default editor:
 
-  ```sql
-  DEFINE _EDITOR = gedit
-  ```
+ ```sql
+ DEFINE _EDITOR = gedit
+ ```
 
-  Then:
+ Then:
 
-  ```sql
-  ED
-  ```
+ ```sql
+ ED
+ ```
 
-  Opens your last command in the editor, you tweak it, save, and then:
+ Opens your last command in the editor, you tweak it, save, and then:
 
-  ```sql
-  /
-  ```
+ ```sql
+ /
+ ```
 
-  Re‑executes the edited command.
+ Reexecutes the edited command.
 
 - Searching for parameters:
 
-  ```sql
-  SHOW PARAMETER file;
-  ```
+ ```sql
+ SHOW PARAMETER file;
+ ```
 
-  Returns all parameters whose names contain the string `file` – such as `db_recovery_file_dest` and its size.
+ Returns all parameters whose names contain the string `file` - such as `db_recovery_file_dest` and its size.
 
 These do not change the database, but they do change how quickly you can find out what is going on.
 
 ---
 
-## 10. Summary – Keeping the Instance on a Short Leash
+## 10. Summary - Keeping the Instance on a Short Leash
 
 By now you should be able to:
 
@@ -411,11 +418,11 @@ By now you should be able to:
 - Use `ALTER SYSTEM` and `ALTER SESSION` to change parameters safely
 - Understand dynamic vs static parameters and use the `SCOPE` clause correctly
 - Navigate the ADR directory structure and know where:
-  - Alert logs
-  - Trace files
-  - Incident and Health Monitor reports
-  - DDL/debug logs
-  live
+ - Alert logs
+ - Trace files
+ - Incident and Health Monitor reports
+ - DDL/debug logs
+ live
 - Use `ADRCI` to inspect alerts and incidents
 - Query `V$` / `GV$` performance views to see what the instance is doing
 - Use data dictionary views (`USER_`, `ALL_`, `DBA_`, `CDB_`) to inspect metadata
@@ -431,7 +438,5 @@ When you are ready to practice this in the lab environment, use:
 - [Lab 6-1 - Basic Initialization Parameters with SQL*Plus](labs/lab06-1-view-parameters-with-sqlplus.md)
 - [Lab 6-2 Part 1 - Viewing Parameters with SQL*Plus](labs/lab06-2-part-1-view-parameters-with-sqlplus.md)
 - [Lab 6-2 Part 2 - Initialization Parameters and the SPFILE/PFILE Search Game](labs/lab06-2-part-2-initialization-parameters-and-spfile-search.md)
-
-
 - [Lab 6-3 - Modifying Initialization Parameters with SQL*Plus](labs/lab06-3-initialization-parameters-and-spfile-search.md)
 - [Lab 6-4 - Viewing Diagnostic Information (ADR, Alert Logs, and DDL Logging)](labs/lab06-4-viewing-diagnostic-information.md)

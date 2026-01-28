@@ -26,232 +26,239 @@ Part A - Locate ADR Directories with `V$DIAG_INFO`
 
 1. Open a terminal and connect as SYSDBA:
 
-   ```bash
-   . oraenv
-   ORACLE_SID = [orclcdb] ? orclcdb
+ ```bash
+ . oraenv
+ ORACLE_SID = [orclcdb] ? orclcdb
 
-   sqlplus / as sysdba
-   ```
+ sqlplus / as sysdba
+ ```
 
-2. Ask Oracle where it hides diagnostic files:
+2. Ask Oracle where it hides diagnostic files (format the output so it is readable):
 
-   ```sql
-   SELECT name, value
-   FROM   v$diag_info;
-   ```
+ ```sql
+ COL name FORMAT a23
+ COL value FORMAT a55
+ SELECT name, value
+ FROM v$diag_info;
+ ```
 
-   Pay attention to at least these rows:
+ Pay attention to at least these rows:
 
-   - `Diag Alert`  -> directory containing the XML alert log (`log.xml`)
-   - `Diag Trace`  -> directory containing the text alert log and trace files
+ - `ADR Base` -> base of the ADR directory tree
+ - `Diag Alert` -> directory containing the XML alert log (`log.xml`)
+ - `Diag Trace` -> directory containing the text alert log and trace files
 
 3. Note the full paths for those two entries; you will cd into them shortly.
 
 4. Exit SQL*Plus:
 
-   ```sql
-   EXIT
-   ```
+ ```sql
+ EXIT
+ ```
 
 Part B - View the XML Alert Log
 -------------------------------
 
 5. Change to the *alert* directory reported for `Diag Alert`:
 
-   ```bash
-   cd /u01/app/oracle/diag/rdbms/orclcdb/orclcdb/alert
-   ls
-   ```
+ ```bash
+ cd /u01/app/oracle/diag/rdbms/orclcdb/orclcdb/alert
+ ls
+ ```
 
-   You should see:
+ You should see:
 
-   ```text
-   log.xml
-   ```
+ ```text
+ log.xml
+ ```
 
 6. View the XML alert log with your preferred tool:
 
-   ```bash
-   more log.xml
-   ```
+ ```bash
+ more log.xml
+ ```
 
-   or, if you like GUIs:
+ or, if you like GUIs:
 
-   ```bash
-   gedit log.xml &
-   ```
+ ```bash
+ gedit log.xml &
+ ```
 
-   As you scroll you will see startup/shutdown messages, DDL events, and errors
-   in XML form.
+ As you scroll you will see startup/shutdown messages, DDL events, and errors
+ in XML form.
 
 Part C - View the Text Alert Log
 --------------------------------
 
 7. Change to the *trace* directory reported for `Diag Trace`:
 
-   ```bash
-   cd /u01/app/oracle/diag/rdbms/orclcdb/orclcdb/trace
-   ls alert*.log
-   ```
+ ```bash
+ cd /u01/app/oracle/diag/rdbms/orclcdb/orclcdb/trace
+ ls alert*.log
+ ```
 
-   You should see something like:
+ You should see something like:
 
-   ```text
-   alert_orclcdb.log
-   ```
+ ```text
+ alert_orclcdb.log
+ ```
 
 8. Look at the last few lines:
 
-   ```bash
-   tail alert_orclcdb.log
-   ```
+ ```bash
+ tail alert_orclcdb.log
+ ```
 
-   This is the plain-text version of the alert log, showing recent database
-   activity and errors.
+ This is the plain-text version of the alert log, showing recent database
+ activity and errors.
 
 9. Optionally, list all trace files:
 
-   ```bash
-   ls *.trc
-   ```
+ ```bash
+ ls *.trc
+ ```
 
-   Each server and background process can write its own trace file when it
-   detects internal errors.
+ Each server and background process can write its own trace file when it
+ detects internal errors. You may also see `*.trm` trace map files, which
+ help tools navigate trace content.
 
 Part D - Use ADRCI to View and Search the Alert Log
 ---------------------------------------------------
 
 10. Start the ADR command interpreter:
 
-    ```bash
-    adrci
-    ```
+ ```bash
+ adrci
+ ```
 
-    If `ORACLE_HOME/bin` is not on your `PATH`, you can set it with:
+ If `ORACLE_HOME/bin` is not on your `PATH`, you can set it with:
 
-    ```bash
-    export PATH=$PATH:$ORACLE_HOME/bin
-    adrci
-    ```
+ ```bash
+ export PATH=$PATH:$ORACLE_HOME/bin
+ adrci
+ ```
 
 11. At the `adrci>` prompt, show the alert log:
 
-    ```text
-    adrci> show alert
-    ```
+ ```text
+ adrci> show alert
+ ```
 
-    - Use `G` (uppercase) to jump to the bottom.
-    - You should see the same last entries you saw in the text alert log.
+ If multiple databases/listeners exist, ADRCI will ask which *home* to use.
+ Choose the one for `orclcdb` and press Enter. The alert log opens in `vi`
+ by default.
+
+ - Use `G` (uppercase) to jump to the bottom.
+ - You should see the same last entries you saw in the text alert log.
 
 12. Search from the bottom for the most recent startup:
 
-    ```text
-    /starting Oracle
-    ```
+ ```text
+ /starting Oracle
+ ```
 
-    Then press `N` (uppercase) to search backwards for the previous match.
+ Then press `N` (uppercase) to search backwards for the previous match.
 
 13. Search for `ALTER` commands:
 
-    ```text
-    /alter
-    ```
+ ```text
+ /alter
+ ```
 
-    Press `N` repeatedly to jump through successive `ALTER DATABASE` entries
-    (for example, `MOUNT`, `OPEN`).
+ Press `N` repeatedly to jump through successive `ALTER DATABASE` entries
+ (for example, `MOUNT`, `OPEN`).
 
-14. When you are finished:
+14. When you are finished, quit `vi` and then exit ADRCI:
 
-    ```text
-    :q
-    adrci> exit
-    ```
+ ```text
+ :q!
+ adrci> exit
+ ```
 
 Part E - Enable DDL Logging and Generate Some DDL
 -------------------------------------------------
 
 15. Start SQL*Plus again as SYSDBA:
 
-    ```bash
-    sqlplus / as sysdba
-    ```
+ ```bash
+ sqlplus / as sysdba
+ ```
 
 16. Switch your session to a PDB (as in the practice, `orclpdb1`):
 
-    ```sql
-    ALTER SESSION SET container = orclpdb1;
-    ```
+ ```sql
+ ALTER SESSION SET container = orclpdb1;
+ ```
 
 17. Check whether DDL logging is enabled:
 
-    ```sql
-    SHOW PARAMETER enable_ddl_logging
-    ```
+ ```sql
+ SHOW PARAMETER enable_ddl_logging
+ ```
 
-    - On Oracle Cloud services this may default to `TRUE`.
-    - In the course VM it is normally `FALSE`.
+ - On Oracle Cloud services this may default to `TRUE`.
+ - In the course VM it is normally `FALSE`.
 
 18. If it is `FALSE`, enable it for **this session only**:
 
-    ```sql
-    ALTER SESSION SET enable_ddl_logging = TRUE;
-    ```
+ ```sql
+ ALTER SESSION SET enable_ddl_logging = TRUE;
+ ```
 
 19. Run a couple of DDL statements to give Oracle something to log:
 
-    ```sql
-    CREATE TABLE test_ddl_log (
-      id  NUMBER,
-      txt VARCHAR2(30)
-    );
+ ```sql
+ CREATE TABLE test_ddl_log (
+ id NUMBER,
+ txt VARCHAR2(30)
+ );
 
-    DROP TABLE test_ddl_log;
-    ```
+ DROP TABLE test_ddl_log;
+ ```
 
 20. Exit SQL*Plus:
 
-    ```sql
-    EXIT
-    ```
+ ```sql
+ EXIT
+ ```
 
 Part F - Inspect the DDL Log Files
 ----------------------------------
 
-21. Change to the `log/ddl` directory under your ADR home. For example:
+21. Change to the ADR `log` directory and list its contents:
 
-    ```bash
-    cd /u01/app/oracle/diag/rdbms/orclcdb/orclcdb/log/ddl
-    ls
-    ```
+ ```bash
+ cd /u01/app/oracle/diag/rdbms/orclcdb/orclcdb/log
+ ls
+ ```
 
-    You should see a file like:
+ You should see a text DDL log file plus a `ddl` subdirectory.
 
-    ```text
-    ddl_orclcdb.log
-    ```
+22. View the text DDL log file:
 
-22. View the text DDL log:
+ ```bash
+ cat ddl_orclcdb.log
+ ```
 
-    ```bash
-    more ddl_orclcdb.log
-    ```
+ Look for entries corresponding to:
 
-    Look for entries corresponding to:
-
-    - `CREATE TABLE TEST_DDL_LOG`
-    - `DROP TABLE TEST_DDL_LOG`
+ - `CREATE TABLE TEST_DDL_LOG`
+ - `DROP TABLE TEST_DDL_LOG`
 
 23. For completeness, inspect the XML version in the `log/ddl` directory:
 
-    ```bash
-    ls *.xml
-    ```
+ ```bash
+ cd ddl
+ ls
+ ```
 
-    and, if you like:
+ You should see `log.xml`, the XML version of the DDL log.
 
-    ```bash
-    gedit ddl_orclcdb.xml &
-    ```
+ And, if you like:
+
+ ```bash
+ gedit log.xml &
+ ```
 
 Step 5 - Clean Up
 -----------------
@@ -267,4 +274,3 @@ You have now:
 
 Which means next time someone says, "Nothing changed, it just broke," you can
 smile, open the DDL log, and say, "Funny story about that..."
-

@@ -16,6 +16,13 @@ We will cover:
 - Dedicated vs shared server connections
 - The zoo of network tools (Net Manager, NETCA, EM, `lsnrctl`)
 
+By the end of this module, you should be able to:
+
+- Explain how clients connect to database services through listeners
+- Compare naming methods (Easy Connect, local, directory)
+- Describe Oracle Net configuration files and tools
+- Differentiate dedicated vs shared server architecture
+
 ---
 
 ## 1. Big Picture: From Client Click To Database Session
@@ -52,9 +59,9 @@ Common service concepts:
 - The **instance name (SID)**, e.g. `ORCL`, is also exposed as a service.
 - Each **PDB name** (e.g. `ORCLPDB1`) is or can be a service.
 - You can create extra services with `DBMS_SERVICE`.
-  - In RAC you usually use `srvctl` (Server Control) to create and manage
-    services; `srvctl` calls `DBMS_SERVICE` behind the scenes and keeps the
-    cluster configuration in sync.
+ - In RAC you usually use `srvctl` (Server Control) to create and manage
+ services; `srvctl` calls `DBMS_SERVICE` behind the scenes and keeps the
+ cluster configuration in sync.
 
 Clients connect to **services**, not directly to SIDs or file names. This
 matters a lot for load balancing, failover, and PDB access.
@@ -72,18 +79,18 @@ The **listener** is a separate process that listens for incoming connections:
 When the instance starts, a background process (LREG) periodically:
 
 - Registers itself and its services with:
-  - The **default listener** on the local host/port
-  - Any additional listeners in:
-    - `LOCAL_LISTENER` (listeners on the same host, non-default ports)
-    - `REMOTE_LISTENER` (listeners on remote hosts, useful in RAC and HA)
+ - The **default listener** on the local host/port
+ - Any additional listeners in:
+ - `LOCAL_LISTENER` (listeners on the same host, non-default ports)
+ - `REMOTE_LISTENER` (listeners on remote hosts, useful in RAC and HA)
 
 Key points:
 
 - One instance can register with **many** listeners.
 - A client must connect to **one** of those listeners that knows about the
-  desired service.
+ desired service.
 - Listeners can live on hosts other than the database host (for security,
-  DMZs, connection managers, etc.).
+ DMZs, connection managers, etc.).
 
 Once a connection is established:
 
@@ -126,7 +133,7 @@ Cons:
 - Cannot be fully secured via Oracle Net configuration (no SSL config, etc.).
 - You lean entirely on the network infrastructure for security.
 - Very limited syntax: you cannot easily express complex failover or load
-  balancing rules in a single Easy Connect string.
+ balancing rules in a single Easy Connect string.
 
 This is why many sites historically used Easy Connect with JDBC thin drivers:
 
@@ -137,7 +144,7 @@ This is why many sites historically used Easy Connect with JDBC thin drivers:
 It works, but the limitations matter:
 
 - You give up richer security and connection policies you get with full
-  Oracle Net configuration.
+ Oracle Net configuration.
 
 ### 4.2 Local Naming (`tnsnames.ora`)
 
@@ -152,12 +159,12 @@ Example `tnsnames.ora` entry:
 
 ```text
 ORCLPDB1 =
-  (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.example.com)(PORT = 1521))
-    (CONNECT_DATA =
-      (SERVICE_NAME = orclpdb1)
-    )
-  )
+ (DESCRIPTION =
+ (ADDRESS = (PROTOCOL = TCP)(HOST = dbhost.example.com)(PORT = 1521))
+ (CONNECT_DATA =
+ (SERVICE_NAME = orclpdb1)
+ )
+ )
 ```
 
 Then you connect with:
@@ -177,18 +184,18 @@ When editing `tnsnames.ora`:
 
 - Use a **simple** text editor (no hidden formatting characters).
 - Be careful with copy/paste; trailing spaces and odd characters can break
-  parsing.
+ parsing.
 - In the demo, we:
-  - Copied the `ORCL` entry.
-  - Renamed the alias to `RON1`.
-  - Connected with:
+ - Copied the `ORCL` entry.
+ - Renamed the alias to `RON1`.
+ - Connected with:
 
-    ```text
-    sqlplus system/oracle_4U@RON1
-    ```
+ ```text
+ sqlplus system/oracle_4U@RON1
+ ```
 
-  - Oracle resolved `RON1` via `tnsnames.ora` and routed us to the correct
-    service.
+ - Oracle resolved `RON1` via `tnsnames.ora` and routed us to the correct
+ service.
 
 ### 4.3 Directory Naming (LDAP / Active Directory)
 
@@ -213,9 +220,9 @@ The `sqlnet.ora` file defines Oracle Net **behaviour and requirements**:
 
 - Which naming methods are used and in what order:
 
-  ```text
-  NAMES.DIRECTORY_PATH = (TNSNAMES, EZCONNECT, LDAP)
-  ```
+ ```text
+ NAMES.DIRECTORY_PATH = (TNSNAMES, EZCONNECT, LDAP)
+ ```
 
 - Encryption, checksumming, and SSL requirements
 - Timeouts, dead connection detection
@@ -240,14 +247,14 @@ When you:
 
 - Hard-code an Easy Connect string in your app, you talk directly to the listener.
 - Use Oracle Net files (`tnsnames.ora`, `sqlnet.ora`), you are using the
-  **Oracle Call Interface (OCI)** stack.
+ **Oracle Call Interface (OCI)** stack.
 
 Advantages of using Oracle Net/OCI:
 
 - You can configure:
-  - SSL/TLS
-  - Encryption and checksumming
-  - Fallback/timeout policies
+ - SSL/TLS
+ - Encryption and checksumming
+ - Fallback/timeout policies
 - Both **client** and **server** sides can enforce matching requirements.
 - DB links and other server-side connections also use these local files.
 
@@ -267,14 +274,14 @@ Common patterns:
 
 - Listener on the DB host (default, simple)
 - Listener on a **separate** host in a DMZ or bastion tier
-  - Clients connect to the "front" listener.
-  - That listener forwards connections to the database side (or to Connection Manager).
+ - Clients connect to the "front" listener.
+ - That listener forwards connections to the database side (or to Connection Manager).
 
 Security reasons for splitting:
 
 - Listeners accept connection requests from *anyone* who can reach them.
 - If someone floods or probes the listener, you would rather it be an isolated
-  listener box than your actual database server.
+ listener box than your actual database server.
 
 If there is **no** listener:
 
@@ -306,9 +313,9 @@ Key differences:
 
 - Multiple connections share a smaller pool of **server processes**.
 - Session state (user global area) must be **shared**, so it moves to the
-  **large pool** in the SGA.
+ **large pool** in the SGA.
 - **Dispatchers** handle incoming requests and route them to available
-  shared servers.
+ shared servers.
 
 Pros:
 
@@ -324,7 +331,7 @@ Rule of thumb:
 
 - OLTP and mixed workloads often stick with dedicated server.
 - Very large web-style environments with many short-lived requests may benefit
-  from shared server.
+ from shared server.
 
 ---
 
@@ -335,17 +342,17 @@ Because nothing says "simple networking" like five different tools.
 ### 9.1 EM Express and EM Cloud Control
 
 - **EM Express**
-  - Lightweight web console, per-database.
-  - Lets you inspect listeners and net services at a high level.
+ - Lightweight web console, per-database.
+ - Lets you inspect listeners and net services at a high level.
 
 - **Enterprise Manager Cloud Control**
-  - Full-blown enterprise management tool.
-  - Can manage:
-    - Databases
-    - App servers
-    - Hosts
-    - Network components
-  - Includes Net Services administration pages (listener status, services, etc.).
+ - Full-blown enterprise management tool.
+ - Can manage:
+ - Databases
+ - App servers
+ - Hosts
+ - Network components
+ - Includes Net Services administration pages (listener status, services, etc.).
 
 ### 9.2 Net Manager (`netmgr`)
 
@@ -388,9 +395,9 @@ lsnrctl stop
 Useful for:
 
 - Verifying:
-  - Which services are registered
-  - Which instances they point to
-  - Which addresses the listener is listening on
+ - Which services are registered
+ - Which instances they point to
+ - Which addresses the listener is listening on
 
 ### 9.5 Manual Editing (When You Are Brave Or Desperate)
 
@@ -405,7 +412,7 @@ You *can* edit them by hand, but:
 - `sqlnet.ora` is very sensitive to whitespace and formatting.
 - A stray tab or extra space in the wrong place can break resolution.
 - Recommended practice: use tools (Net Manager, NETCA, EM) to generate/modify,
-  and only hand-edit when you really know what you are doing.
+ and only hand-edit when you really know what you are doing.
 
 ---
 
@@ -421,9 +428,9 @@ Two main possibilities:
 If `TNS_ADMIN` is set:
 
 - All Oracle Net files are expected there:
-  - `listener.ora`
-  - `tnsnames.ora`
-  - `sqlnet.ora`
+ - `listener.ora`
+ - `tnsnames.ora`
+ - `sqlnet.ora`
 
 If it is not set:
 
@@ -442,12 +449,12 @@ This matters when you:
 Putting it together:
 
 - Dedicated server:
-  - Simple, predictable, more PGA usage per connection.
-  - Great for OLTP and reporting-heavy systems.
+ - Simple, predictable, more PGA usage per connection.
+ - Great for OLTP and reporting-heavy systems.
 
 - Shared server:
-  - More complex, uses large pool for session state.
-  - Great for thousands of lightweight connections doing small bits of work.
+ - More complex, uses large pool for session state.
+ - Great for thousands of lightweight connections doing small bits of work.
 
 You can also mix modes:
 
@@ -474,17 +481,17 @@ Questions worth answering *up front*:
 Things you *can* control with Oracle Net:
 
 - **Protocol** and security:
-  - Plain TCP
-  - TCP + SSL/TLS
-  - Checksumming on or off
+ - Plain TCP
+ - TCP + SSL/TLS
+ - Checksumming on or off
 - **Packet size and compression**:
-  - Larger packets and compression can push more data per round-trip.
-  - But compression costs CPU, so usually you set a **threshold**: only compress
-    when traffic is high enough to justify it.
+ - Larger packets and compression can push more data per round-trip.
+ - But compression costs CPU, so usually you set a **threshold**: only compress
+ when traffic is high enough to justify it.
 - **HA behaviour**:
-  - You can define load balancing and failover either
-    - In the **service** definition in the database (recommended), or
-    - In the **TNS connect descriptor** in `tnsnames.ora`.
+ - You can define load balancing and failover either
+ - In the **service** definition in the database (recommended), or
+ - In the **TNS connect descriptor** in `tnsnames.ora`.
 
 This is not something you improvise at 3 a.m. in production. Align it with:
 
@@ -499,11 +506,11 @@ This is not something you improvise at 3 a.m. in production. Align it with:
 Every Oracle service effectively has **two pieces**:
 
 1. The **service name** itself:
-   - Could be the instance name (`ORCL`)
-   - Could be a PDB name (`ORCLPDB1`)
-   - Could be an application service you created (`FINANCE`)
+ - Could be the instance name (`ORCL`)
+ - Could be a PDB name (`ORCLPDB1`)
+ - Could be an application service you created (`FINANCE`)
 2. The **domain**:
-   - For example: `.us.flowers.com`
+ - For example: `.us.flowers.com`
 
 Together they form the **global service name**:
 
@@ -516,12 +523,12 @@ code. Instead, you define a **net service name** (alias) in `tnsnames.ora`:
 
 ```text
 FINFLOWERS =
-  (DESCRIPTION =
-    (ADDRESS = (PROTOCOL=TCP)(HOST=listenerbox)(PORT=1521))
-    (CONNECT_DATA =
-      (SERVICE_NAME = FINANCE.us.flowers.com)
-    )
-  )
+ (DESCRIPTION =
+ (ADDRESS = (PROTOCOL=TCP)(HOST=listenerbox)(PORT=1521))
+ (CONNECT_DATA =
+ (SERVICE_NAME = FINANCE.us.flowers.com)
+ )
+ )
 ```
 
 Then applications just use:
@@ -533,13 +540,13 @@ system/cloud_4U@FINFLOWERS
 Benefits:
 
 - Small extra layer of indirection: if someone reverse-engineers the alias from
-  the app (`FINFLOWERS`) they still do not know the actual global service name.
+ the app (`FINFLOWERS`) they still do not know the actual global service name.
 - You can repoint the alias to a different service or host without touching the app.
 
 Remember:
 
 - `tnsnames.ora` lives on **clients** and also on the **database host** for
-  server-side connections like DB links.
+ server-side connections like DB links.
 
 ---
 
@@ -551,31 +558,31 @@ We touched on naming methods earlier; here is the slightly deeper dive.
 
 - Uses a bare connect string:
 
-  ```text
-  user/password@host:port/service
-  ```
+ ```text
+ user/password@host:port/service
+ ```
 
 - Enabled by default even if you have no `sqlnet.ora`.
 - Great for:
-  - Labs
-  - Quick tests
-  - Scripts where you control both ends
+ - Labs
+ - Quick tests
+ - Scripts where you control both ends
 
 Downside:
 
 - You cannot describe rich connection policies (SSL, compression, failover)
-  in Easy Connect alone. You rely heavily on the network perimeter.
+ in Easy Connect alone. You rely heavily on the network perimeter.
 
 ### 14.2 Local Naming (TNSNAMES)
 
 We already covered this, but the operational cost is worth repeating:
 
 - The `tnsnames.ora` file must exist on:
-  - Every client host that connects
-  - Every database host that needs DB links or outgoing connections
+ - Every client host that connects
+ - Every database host that needs DB links or outgoing connections
 - Any change in service or host location means:
-  - Updating all relevant copies
-  - Or centralizing via config management
+ - Updating all relevant copies
+ - Or centralizing via config management
 
 Useful and very common, but know what you are signing up for.
 
@@ -605,44 +612,44 @@ External naming is when the directory or OS is not fully Oracle-aware.
 Key warning:
 
 - With many third-party directories or pure OS authentication, Oracle treats
-  the fact that you reached the database host as the real security barrier.
+ the fact that you reached the database host as the real security barrier.
 - Once you are "inside the neighborhood," the **front door may be open**.
 
 The instructor demo showed this difference clearly:
 
 - OS-authenticated connection:
 
-  ```bash
-  # On the database host as the oracle user
-  sqlplus / as sysdba
-  SHOW USER;  -- SYS
-  ```
+ ```bash
+ # On the database host as the oracle user
+ sqlplus / as sysdba
+ SHOW USER; -- SYS
+ ```
 
 - Still OS-authenticated, but with bogus credentials:
 
-  ```bash
-  sqlplus dummy/junk as sysdba
-  SHOW USER;  -- still SYS
-  ```
+ ```bash
+ sqlplus dummy/junk as sysdba
+ SHOW USER; -- still SYS
+ ```
 
-  Over OS authentication, Oracle ignores the supplied username/password and
-  trusts the OS user and group membership instead.
+ Over OS authentication, Oracle ignores the supplied username/password and
+ trusts the OS user and group membership instead.
 
 - But if you go through Oracle Net (network authentication):
 
-  ```bash
-  sqlplus dummy/junk@orcl as sysdba
-  ```
+ ```bash
+ sqlplus dummy/junk@orcl as sysdba
+ ```
 
-  You now get an authentication failure, because the credentials matter.
+ You now get an authentication failure, because the credentials matter.
 
 Takeaways:
 
 - For secure deployments:
-  - Use Oracle-aware directory services (Oracle directory, Kerberos) when you
-    want centralized auth.
-  - Be very cautious with generic external naming where Oracle does not
-    re-authenticate.
+ - Use Oracle-aware directory services (Oracle directory, Kerberos) when you
+ want centralized auth.
+ - Be very cautious with generic external naming where Oracle does not
+ re-authenticate.
 
 ---
 
@@ -654,18 +661,18 @@ High availability is not just a RAC or Data Guard problem; it is also a
 You can define load balancing and failover:
 
 - At the **service** level (preferred):
-  - Use services that span multiple instances/databases.
-  - Configure failover and load balancing in the service, and let the database
-    and listener advertise it.
+ - Use services that span multiple instances/databases.
+ - Configure failover and load balancing in the service, and let the database
+ and listener advertise it.
 - In the **TNS connect descriptor**:
-  - Configure multiple addresses and options like:
+ - Configure multiple addresses and options like:
 
-    ```text
-    (LOAD_BALANCE=ON)
-    (FAILOVER=ON)
-    ```
+ ```text
+ (LOAD_BALANCE=ON)
+ (FAILOVER=ON)
+ ```
 
-  - List multiple listener addresses and let the client cycle through them.
+ - List multiple listener addresses and let the client cycle through them.
 
 This must be planned alongside:
 
@@ -686,9 +693,9 @@ By now you should be able to:
 - Understand why listener host does not always equal database host
 - Contrast dedicated vs shared server connections and when each is appropriate
 - Identify the main tools for managing Oracle Net:
-  - EM Express / EM Cloud Control
-  - Net Manager / NETCA
-  - `lsnrctl`
+ - EM Express / EM Cloud Control
+ - Net Manager / NETCA
+ - `lsnrctl`
 
 Which means the next time a developer says "the database is down" because they
 cannot connect, you can calmly check the listener, the services, the naming

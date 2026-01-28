@@ -4,41 +4,42 @@
 Oracle Database 19c: Administration Workshop
 
 ## Course ID / Exam Code
-e.g. LVC-DB19C-ADMIN / 1Z0-082
+D106546GC10 / 1Z0-082
 
 ## Date / Duration
-Start: YYYY-MM-DD  
-End: YYYY-MM-DD  
-Hours: XX  
+Start:
+End:
+Hours:
 
 ## Instructor
-Name:  
-Notes / Tips:  
+Name:
+Notes / Tips:
 
 ## Objectives
-- Understand database architecture
-- Configure instance and storage structures
-- Perform backup, recovery, and patching
+- Describe Oracle database architecture and multitenant concepts
+- Create databases using DBCA and SQL
+- Start, stop, and manage database instances and PDBs
+- Understand Oracle Net services and connection methods
 
 ## Prerequisites
-- Oracle Linux basics
+- Oracle Linux or UNIX basics
 - SQL fundamentals
-- RMAN familiarity
 
 ## Course Modules
 | Module | Title | Status | Notes |
-|---------|--------|---------|-------|
-| 1 | Database Architecture | ✅ | Refresher |
-| 2 | Instance Configuration | 🔄 | |
-| 3 | Backup & Recovery | | |
-| 4 | Multitenant (CDB/PDB) | | |
-| 5 | Performance Tuning | | |
+|--------|-------|--------|-------|
+| 1 | Introduction to Oracle Database | | Architecture refresh |
+| 2 | Accessing an Oracle Database | | Tools and connection methods |
+| 3 | Creating an Oracle Database by Using DBCA | | Templates, character sets |
+| 4 | Creating an Oracle Database by Using a SQL Command | | Manual creation |
+| 5 | Starting Up and Shutting Down a Database Instance | | Startup/shutdown modes |
+| 6 | Managing Database Instances | | Parameters, ADR, views |
+| 7 | Oracle Net Services: Overview | | Listener and naming |
 
 ## Key Takeaways
-- ASM and FRA configuration best practices
-- Using EM Express vs CLI
-- Typical pitfalls during patching
+- Know which tool to use for each admin task (SQL*Plus, DBCA, EM)
+- Understand startup/shutdown modes and PDB saved states
+- Use ADR/ADRCI to locate logs and diagnostics
 
 ## Related SOPs / Scripts
-- [backup_rman.sh](../scripts/backup_rman.sh)
-- [check_fra.sql](../sql/check_fra.sql)
+- `sops/backup_rman.md`
