@@ -25,25 +25,25 @@ This drops and recreates the `MESSAGES` table.
 
 ```sql
 DECLARE
-  v_ename  employees.last_name%TYPE;
-  vm_sal   employees.salary%TYPE := 6000;
+  v_ename   employees.last_name%TYPE;
+  v_emp_sal employees.salary%TYPE := 6000;
 BEGIN
   SELECT last_name
   INTO v_ename
   FROM employees
-  WHERE salary = vm_sal;
+  WHERE salary = v_emp_sal;
 
   INSERT INTO messages (results)
-  VALUES (v_ename || ' - ' || TO_CHAR(vm_sal));
+  VALUES (v_ename || ' - ' || TO_CHAR(v_emp_sal));
 
 EXCEPTION
   WHEN NO_DATA_FOUND THEN
     INSERT INTO messages (results)
-    VALUES ('No employee with a salary of ' || TO_CHAR(vm_sal));
+    VALUES ('No employee with a salary of ' || TO_CHAR(v_emp_sal));
 
   WHEN TOO_MANY_ROWS THEN
     INSERT INTO messages (results)
-    VALUES ('More than one employee with a salary of ' || TO_CHAR(vm_sal));
+    VALUES ('More than one employee with a salary of ' || TO_CHAR(v_emp_sal));
 
   WHEN OTHERS THEN
     INSERT INTO messages (results)
@@ -61,8 +61,8 @@ SELECT *
 FROM messages;
 ```
 
-- With `vm_sal := 6000`, you should see: **More than one employee with a salary of 6000**
-- With `vm_sal := 2000`, you should see: **No employee with a salary of 2000**
+- With `v_emp_sal := 6000`, you should see: **More than one employee with a salary of 6000**
+- With `v_emp_sal := 2000`, you should see: **No employee with a salary of 2000**
 
 ---
 

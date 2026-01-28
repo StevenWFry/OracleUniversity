@@ -8,6 +8,7 @@ By the end of this lesson, you should be able to:
 - Explain the benefits of PL/SQL
 - Identify different types of PL/SQL blocks
 - Output messages from PL/SQL
+- Relate what you are doing in the lab to the matching lesson and practice numbers in the Student Guide and Activity Guide
 
 ---
 
@@ -24,6 +25,47 @@ Imagine a login screen. The app collects a username and password, passes them in
 
 ---
 
+## 1a. Limitations of Plain SQL (as the Student Guide politely reminds you)
+
+The Student Guide opens this lesson by pointing out exactly where SQL starts to wobble on its own:
+
+- SQL is **set-oriented**, not procedural.
+- SQL statements are **sent one at a time** from the client to the database.
+- SQL on its own has **no variables, no loops, no IF/ELSE**, and no built-in error handling logic.
+
+So if you try to write "check this, then that, then maybe update that other thing" in pure SQL, you end up with:
+
+- A pile of round-trips between app and database.
+- Business rules scattered across multiple places.
+- No central, versioned, debuggable unit of work.
+
+PL/SQL is the fix: you wrap multiple SQL statements, variables, and logic into a single block and send that to the database as one coherent thought.
+
+Plain SQL from a client (multiple calls):
+
+```sql
+UPDATE employees
+SET salary = salary * 1.05
+WHERE employee_id = 100;
+
+UPDATE employees
+SET salary = salary * 1.05
+WHERE employee_id = 101;
+```
+
+Same idea as one PL/SQL unit of work:
+
+```sql
+BEGIN
+  UPDATE employees
+  SET salary = salary * 1.05
+  WHERE employee_id IN (100, 101);
+END;
+/
+```
+
+---
+
 ## 2. What PL/SQL Is (and what it adds)
 
 PL/SQL stands for **Procedural Language Extension to SQL**. It:
@@ -34,6 +76,23 @@ PL/SQL stands for **Procedural Language Extension to SQL**. It:
 - Supports reusable program units stored in the database
 
 So yes, you get **loops**, **IF/THEN/ELSE**, and **CASE**, plus the ability to compile and reuse stored logic.
+
+---
+
+## 2a. About PL/SQL (the brochure version from the Student Guide)
+
+If we translate the Student Guide bullet slide into human:
+
+- PL/SQL is **tightly integrated with SQL** – you do not bolt it on; it lives in the database engine.
+- It is **portable** across Oracle platforms – your code travels better than most budget airlines.
+- It supports **structured, modular programming** via blocks, subprograms, and packages.
+- It includes **exception handling**, so you can specify exactly what happens when something explodes.
+
+In other words, PL/SQL lets you:
+
+- Keep data logic **close to the data**.
+- Write code that is **readable, debuggable, and reusable**.
+- Avoid having every application re-implement the same business rules in five different languages.
 
 ---
 
@@ -76,6 +135,28 @@ Each statement goes to the right engine, so PL/SQL can orchestrate SQL instead o
 
 ---
 
+## 5a. Block Types (anonymous vs stored, like the Student Guide slide but louder)
+
+The Student Guide calls out three main block “flavors”:
+
+- **Anonymous blocks**
+  - Not stored in the data dictionary.
+  - Compiled each time they run.
+  - Great for labs, ad‑hoc scripts, and experimentation.
+
+- **Stored subprograms**
+  - **Procedures** and **functions** created with `CREATE PROCEDURE` / `CREATE FUNCTION`.
+  - Stored in the database, versioned and granted like other objects.
+  - Reused by applications, jobs, and other PL/SQL.
+
+- **Triggers**
+  - Blocks wired to events (`INSERT`, `UPDATE`, `DELETE`, DDL, logon/logoff, etc.).
+  - Fire automatically when the event occurs.
+
+For Unit 1 (lessons 2–5 in the Student Guide), you live almost entirely in anonymous blocks, getting used to the syntax and basic runtime behavior.
+
+---
+
 ## 6. PL/SQL Block Structure (the three-section sandwich)
 
 A PL/SQL block has up to three sections:
@@ -94,6 +175,34 @@ END;
 ```
 
 The `/` is the **block terminator** used in SQL*Plus and in scripts when mixing PL/SQL and SQL.
+
+---
+
+## 6a. Examining and Executing a Block (this is literally what Practice 2 tests)
+
+The Student Guide walks you through a simple block and then the Activity Guide immediately asks, “Which of these blocks actually run?”
+
+Typical things to check:
+
+- Does it have a `BEGIN ... END;` **executable section**?
+- Are all statements **terminated with semicolons**?
+- Is there a `/` on a line by itself when you run it as a script?
+
+Example “good citizen” block:
+
+```sql
+SET SERVEROUTPUT ON
+
+DECLARE
+  v_amount  INTEGER(10);
+BEGIN
+  v_amount := 100;
+  DBMS_OUTPUT.PUT_LINE('Amount is ' || v_amount);
+END;
+/
+```
+
+This is the style you formalize in **Activity Guide Practice 2: Introduction to PL/SQL**, where you test multiple block variants and then write your own `Hello World` block (`lab_02_02_soln.sql`).
 
 ---
 
@@ -142,6 +251,8 @@ Key points:
 
 - `SET SERVEROUTPUT ON` is required **once per session**
 - Use **Run Script** (`F5`) for PL/SQL blocks
+
+This directly lines up with the “enable output then run as a script” steps in the Student Guide and in **Activity Guide Practice 2**.
 
 ---
 

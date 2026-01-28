@@ -12,6 +12,20 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 18: Creating Triggers)
+
+In the Student Guide, this lines up with **Lesson 18: Creating Triggers**. The agenda there covers:
+
+- What triggers are and why you use them
+- Trigger event types and available trigger types
+- Statement vs row-level triggers, OLD/NEW and pseudorecords
+- Creating DML triggers (both with `CREATE TRIGGER` and SQL Developer)
+- Managing trigger status and viewing trigger information
+
+The material below follows that same progression, and your lab is the hands-on version of **Activity Guide Practice 18**, where you build salary validation and business-hour triggers (`CHECK_SALARY_TRIG` and `DELETE_M_TRIG`) wired to reusable procedures.
+
+---
+
 ## 1. What Is a Trigger?
 
 A trigger is a **PL/SQL block stored in the database** that fires automatically when a specific event occurs.

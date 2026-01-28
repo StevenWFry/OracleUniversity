@@ -13,6 +13,22 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (the Student Guide slide in human)
+
+In the Student Guide, this maps to **Lesson 4: Writing Executable Statements**. The official agenda bullets are:
+
+- Lexical units in a PL/SQL block
+- PL/SQL block syntax and guidelines
+- Commenting code
+- SQL functions in PL/SQL
+- Using sequences in PL/SQL blocks
+- Nested blocks, scope, and qualifiers
+- Operators and programming guidelines
+
+Everything below hits those same beats; the only difference is that here, you’re allowed to laugh at them.
+
+---
+
 ## 1. Lexical Units (the alphabet soup of PL/SQL)
 
 Lexical units are the building blocks of PL/SQL. They include letters, numerals, spaces, tabs, returns, and symbols. They fall into four types:
@@ -23,6 +39,32 @@ Lexical units are the building blocks of PL/SQL. They include letters, numerals,
 - **Comments**: `-- single line` or `/* multi-line */`
 
 Yes, comments are officially part of the language. They are also the only thing preventing future you from crying in the break room.
+
+---
+
+## 1a. Block Syntax and Guidelines (so the compiler doesn’t file a complaint)
+
+The Student Guide calls this “block syntax and guidelines,” which is a fancy way of saying:
+
+- Every statement ends with a **semicolon** (`;`).
+- The block ends with `END;` followed by a `/` when you run it as a script.
+- Indentation should reflect block structure (nested blocks indented further).
+- Put **one statement per line** unless you enjoy reading sideways.
+
+Example of a nicely-behaved mini block:
+
+```sql
+DECLARE
+  v_weight  NUMBER(3) := 600;
+  v_message VARCHAR2(255) := 'Product 10012';
+BEGIN
+  v_weight  := v_weight + 1;
+  v_message := v_message || ' is in stock';
+END;
+/
+```
+
+Your future debugging self will silently thank you.
 
 ---
 
@@ -129,6 +171,27 @@ Attempting to reference `v_inner` outside its block results in a compile error.
 
 ---
 
+## 6a. Variable Scope and Visibility (a.k.a. the Practice 4 trap)
+
+The Activity Guide’s **Practice 4: Writing Executable Statements** exists almost entirely to make you think about scope.
+
+Quick rules, straight from that exercise:
+
+- Inner blocks **can see** outer variables (until they redeclare them).
+- Outer blocks **cannot see** inner variables (ever).
+- If you declare the **same name** in an inner block, it hides the outer one inside that inner block.
+
+That is why, in the classic `v_weight` / `v_new_locn` example from the Activity Guide:
+
+- `v_weight` at the inner “position 1” is `2` (local copy).
+- `v_new_locn` at “position 1” is `'Western Europe'`.
+- `v_weight` at the outer “position 2” is `601`.
+- `v_new_locn` at “position 2” is **illegal** – that variable never left the inner block.
+
+If this feels petty and vindictive, congratulations: you understand scope.
+
+---
+
 ## 7. Labels and Qualifiers (breaking scope on purpose)
 
 If you use the same variable name in nested blocks, PL/SQL defaults to the **nearest** scope. Labels let you explicitly reference the outer block:
@@ -166,6 +229,19 @@ And please, for the sake of every future maintainer:
 - Use consistent naming conventions
 
 SQL Developer's formatter is your friend. Treat it better than you treat your phone battery.
+
+---
+
+## 8a. Programming Guidelines (the “please don’t do that” slide)
+
+The Student Guide wraps this lesson with a set of programming guidelines that are basically professional peer pressure:
+
+- Prefer **meaningful identifiers** over single letters for anything that lives longer than three lines.
+- Keep blocks **short and focused** – if your `BEGIN ... END;` runs for four pages, it wants to be a subprogram.
+- Use **comments** for *why*, not for “SELECT means select”.
+- Avoid clever side effects in expressions; clarity wins over showing off.
+
+In other words: write code as if someone else will have to maintain it. Because they will. It might even be you.
 
 ---
 

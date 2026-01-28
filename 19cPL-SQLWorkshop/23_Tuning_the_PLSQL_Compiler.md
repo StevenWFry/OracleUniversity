@@ -9,6 +9,19 @@ After completing this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 21: tuning the compiler)
+
+In the Student Guide, this matches **Lesson 21: Tuning the PL/SQL Compiler**. The agenda covers:
+
+- Initialization parameters for PL/SQL compilation (`PLSQL_CODE_TYPE`, `PLSQL_OPTIMIZE_LEVEL`)
+- Viewing and changing compilation settings
+- Compile-time warnings: categories, enabling/disabling, elevating to errors
+- Using the `PLSQL_WARNINGS` parameter and the `DBMS_WARNING` package
+
+The sections below align with those topics, and the lab implements **Activity Guide Practice 21**, where you flip native/interpreted modes, toggle warnings, compile a procedure that generates warnings, and then classify warnings using `DBMS_WARNING`.
+
+---
+
 ## Compiler Initialization Parameters
 
 The compiler rearranges code for performance. You control it with initialization parameters. The two most important for this course:
@@ -26,6 +39,16 @@ Code type:
 
 - `INTERPRETED` (default) for debugging
 - `NATIVE` for performance (often faster)
+
+Quick demo of switching a session to native, high-optimization mode:
+
+```sql
+ALTER SESSION SET plsql_code_type      = native;
+ALTER SESSION SET plsql_optimize_level = 3;
+
+-- Now (re)compile a program unit in this session
+ALTER PROCEDURE demo_proc COMPILE;
+```
 
 ---
 
@@ -84,6 +107,17 @@ You can also mark a specific warning as an error:
 ALTER SESSION SET plsql_warnings = 'error:05003';
 ```
 
+Simple procedure that will generate warnings:
+
+```sql
+CREATE OR REPLACE PROCEDURE unreachable_code_demo IS
+BEGIN
+  RETURN;
+  DBMS_OUTPUT.PUT_LINE('You will never see this');  -- PLW-06002
+END unreachable_code_demo;
+/ 
+```
+
 ---
 
 ## DBMS_WARNING Package
@@ -97,6 +131,20 @@ DBMS_WARNING.get_category(7203);
 ```
 
 If you forget what 7203 means, the package will remind you. Politely.
+
+Example in an anonymous block:
+
+```sql
+DECLARE
+  v_settings VARCHAR2(512);
+BEGIN
+  v_settings := DBMS_WARNING.get_warning_setting_string;
+  DBMS_OUTPUT.PUT_LINE('Current settings: ' || v_settings);
+
+  DBMS_WARNING.set_warning_setting_string('enable:severe,enable:performance', 'SESSION');
+END;
+/ 
+```
 
 ---
 

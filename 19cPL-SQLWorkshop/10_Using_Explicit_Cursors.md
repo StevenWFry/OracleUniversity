@@ -14,6 +14,21 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 8 with fewer laser pointers)
+
+In the Student Guide, explicit cursors are **Lesson 8: Using Explicit Cursors**. The agenda covers:
+
+- Cursors in general (implicit vs explicit)
+- Declaring, opening, fetching from, and closing explicit cursors
+- Cursor records and cursor FOR loops (including subquery FOR loops)
+- Explicit cursor attributes: `%ISOPEN`, `%FOUND`, `%NOTFOUND`, `%ROWCOUNT`
+- Cursor parameters and reusing the same cursor for multiple active sets
+- `FOR UPDATE` and `WHERE CURRENT OF` for row-level locking and updates
+
+This file plus its Part 2 and lab align with that structure and directly back up **Activity Guide Practice 8**, where you write the “due for a raise” cursor FOR loop and the two-cursor department/employee report.
+
+---
+
 ## 1. Implicit vs Explicit Cursors (autopilot vs manual)
 
 - **Implicit cursors** are created and managed by PL/SQL for every SQL statement.

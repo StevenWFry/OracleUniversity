@@ -12,6 +12,20 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 6, but with jokes)
+
+In the Student Guide, this is **Lesson 6: Writing Control Structures**. The agenda there walks through:
+
+- PL/SQL control structures in general
+- IF / ELSIF / ELSE and how NULL behaves in conditions
+- CASE expressions vs CASE statements
+- LOOP, WHILE, and FOR loops (including rules and examples)
+- Nested loops, labels, and the `CONTINUE` statement
+
+Everything you do in this chapter lines up with that structure and feeds directly into **Activity Guide Practice 6**, where you build real IFs and loops instead of just admiring them on slides.
+
+---
+
 ## 1. IF Statements (the polite bouncer)
 
 If the condition is true, the code runs. If it is not, it does not. That is the deal.
@@ -194,6 +208,36 @@ END LOOP;
 
 You cannot reference `i` outside the loop. It is a loaner, not a roommate.
 
+### 5.4 Labeled Loops (when you name your loops)
+
+Labels let you point at a specific loop when you `EXIT` or `CONTINUE`, which is especially useful with nested loops.
+
+Basic label syntax:
+
+```sql
+<<outer_loop>>
+FOR i IN 1..3 LOOP
+  <<inner_loop>>
+  FOR j IN 1..3 LOOP
+    IF j = 2 THEN
+      CONTINUE inner_loop;   -- skip the rest of the inner loop, next j
+    END IF;
+
+    IF i = 3 THEN
+      EXIT outer_loop;       -- leave both loops completely
+    END IF;
+
+    DBMS_OUTPUT.PUT_LINE('i=' || i || ', j=' || j);
+  END LOOP inner_loop;
+END LOOP outer_loop;
+```
+
+Things to notice:
+
+- Labels go before the loop (`<<outer_loop>>`) and can optionally be repeated after `END LOOP outer_loop;`
+- `EXIT outer_loop;` jumps out of that specific loop, even from inside an inner loop
+- `CONTINUE inner_loop;` skips to the next iteration of the labeled loop
+
 ---
 
 ## 6. Example: INSERT with a Loop
@@ -204,6 +248,43 @@ Given:
 - max `location_id` for Canada is 1900
 
 Loop inserts three new locations: 1901, 1902, 1903, then reports 3 rows added. This is a loop doing exactly what you expect, which is rare and should be celebrated.
+
+Example in the HR sample schema:
+
+```sql
+DECLARE
+  v_country_id    locations.country_id%TYPE    := 'CA';
+  v_max_loc_id    locations.location_id%TYPE;
+  v_rows_inserted PLS_INTEGER                  := 0;
+BEGIN
+  -- Find the current maximum location_id for this country
+  SELECT MAX(location_id)
+  INTO v_max_loc_id
+  FROM locations
+  WHERE country_id = v_country_id;
+
+  -- Insert three new locations with consecutive IDs
+  FOR l_loc_id IN v_max_loc_id + 1 .. v_max_loc_id + 3 LOOP
+    INSERT INTO locations (location_id,
+                           street_address,
+                           postal_code,
+                           city,
+                           state_province,
+                           country_id)
+    VALUES (l_loc_id,
+            'New Canadian office ' || l_loc_id,
+            'N/A',
+            'Somewhere',
+            'Some-Province',
+            v_country_id);
+
+    v_rows_inserted := v_rows_inserted + 1;
+  END LOOP;
+
+  DBMS_OUTPUT.PUT_LINE(v_rows_inserted || ' locations added for country ' || v_country_id);
+END;
+/
+```
 
 ---
 

@@ -12,6 +12,19 @@ After completing this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 19: advanced triggers)
+
+In the Student Guide, this is **Lesson 19: Creating Compound, DDL, and Event Database Triggers**. The agenda there covers:
+
+- What compound triggers are and how they group multiple timing points
+- Mutating tables and how compound triggers help avoid them
+- Creating and using DDL triggers
+- Creating and using database/event triggers
+
+This chapter’s sections follow that sequence, and your lab is the practical version of **Activity Guide Practice 19**, where you intentionally hit a mutating table error with salary rules and then repair it using a package plus compound/DDL/event triggers.
+
+---
+
 ## Compound DML Triggers
 
 Want a BEFORE statement trigger, AFTER statement trigger, BEFORE row trigger, and AFTER row trigger -- all tied to the same event -- without creating four separate triggers? That is a compound trigger. One trigger, four possible timing points, shared state, fewer headaches.

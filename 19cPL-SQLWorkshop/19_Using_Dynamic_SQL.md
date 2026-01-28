@@ -10,6 +10,19 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 17: Using Dynamic SQL)
+
+In the Student Guide, this is **Lesson 17: Using Dynamic SQL**. The agenda covers:
+
+- What dynamic SQL is and when you actually need it
+- The four “methods” of dynamic SQL with NDS and `DBMS_SQL`
+- Execution flow of SQL when you build statements at runtime
+- When to stick with `EXECUTE IMMEDIATE` vs when to move to `DBMS_SQL`
+
+The examples below line up with those methods, and the lab is the implementation of **Activity Guide Practice 17**, where you build `TABLE_PKG` for dynamic DDL/DML and `COMPILE_PKG` to recompile PL/SQL objects via dynamic `ALTER` statements.
+
+---
+
 ## 1. What Is Dynamic SQL?
 
 Dynamic SQL is SQL whose full text is unknown until runtime. It is useful when:

@@ -13,6 +13,20 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## 0. Where This Lesson Fits (Student Guide Lesson 5, but louder)
+
+In the Student Guide, this material is **Lesson 5: Using SQL Statements within a PL/SQL Block**. The agenda runs through:
+
+- Which SQL statements can appear in PL/SQL
+- `SELECT` in PL/SQL and `SELECT ... INTO`
+- Retrieving data and handling naming ambiguities
+- Using PL/SQL to manipulate data (`INSERT/UPDATE/DELETE/MERGE`)
+- Implicit SQL cursors and their attributes
+
+The code you write here is exactly what shows up again in **Activity Guide Practice 5**, where you build scripts such as `lab_05_01_soln.sql` through `lab_05_03_soln.sql`.
+
+---
+
 ## 1. SQL Inside PL/SQL (the rules of the house)
 
 SQL includes:
@@ -46,6 +60,38 @@ END;
 ```
 
 If it returns more than one row: **ORA-01422**. If it returns no rows: **ORA-01403**.
+
+---
+
+## 2a. Naming Ambiguities (the “which one of you is Bob?” problem)
+
+The Student Guide calls out naming ambiguities explicitly, because this bites almost everyone once.
+
+Two main gotchas:
+
+- A column name is the same as a variable name.
+- A variable name is the same as a function name.
+
+Example of a column/variable collision:
+
+```sql
+DECLARE
+  salary NUMBER := 1000;  -- bad idea: same name as column
+BEGIN
+  SELECT salary
+  INTO   salary
+  FROM   employees
+  WHERE  employee_id = 100;
+END;
+/
+```
+
+Inside the `SELECT`, `salary` is treated as the **column**, not the variable. The fix is simple and very Student‑Guide‑approved:
+
+- Use prefixes (`v_salary`, `c_tax`, etc.).
+- Or qualify table columns (`employees.salary`) to be painfully explicit.
+
+Your future debugging sessions will be much shorter.
 
 ---
 

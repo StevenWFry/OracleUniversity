@@ -133,6 +133,10 @@ Each lesson comes in two flavors:
 - [24_Managing_Dependencies.md](24_Managing_Dependencies.md)
 - [24_Managing_Dependencies_Lab.md](24_Managing_Dependencies_Lab.md)
 
+## Exam Review
+
+- [PL/SQL Certification Exam Topics](PLSQL_Exam_Topics.md)
+
 ## Final Summary
 
 - [FINAL_COURSE_SUMMARY.md](FINAL_COURSE_SUMMARY.md)
