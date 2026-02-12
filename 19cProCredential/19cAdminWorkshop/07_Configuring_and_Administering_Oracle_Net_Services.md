@@ -701,3 +701,329 @@ Which means the next time a developer says "the database is down" because they
 cannot connect, you can calmly check the listener, the services, the naming
 method, and the directory configuration and reply, "No, the database is fine,
 but your connect string is lying to you."
+
+---
+
+## 17. Chapter 2 Deep Dive: Oracle Net Components and Naming (Now With More Ways To Misconfigure One Port)
+
+This section tracks the lecture flow for Chapter 2: how Oracle Net decisions are
+made, where naming fits, and why failed listener requests can mean either
+"typo" or "intruder."
+
+### 17.1 The Decision Order For Connection Management
+
+Before building Oracle Net, decide this in order:
+
+1. What type of client-to-database connection pattern you need.
+2. Which naming method supports that pattern.
+3. Which protocol/security settings are required for traffic.
+4. Where failover/load balancing policy should live (service vs TNS).
+
+If you skip this and "just make it work," you eventually inherit a network
+configuration that nobody understands and everybody fears.
+
+### 17.2 What A Client Actually Needs To Connect
+
+At minimum, the client must find:
+
+- A reachable listener address
+- A service name that listener knows
+
+Once the listener receives the request:
+
+- It matches requested service to a registered database instance.
+- It hands off the connection to a server process.
+- After handoff, listener is out of the data path.
+
+Translation: listener opens the door, then leaves the room.
+
+### 17.3 Why Failed Listener Requests Matter
+
+Monitor listener failures, not just total connections.
+
+Repeated failed requests can indicate:
+
+- Broken routing or bad naming config (wrong host/port/service)
+- Credential/service-name brute-force attempts
+
+Action: review failed connection patterns first, then decide whether you are
+fixing config drift or dealing with a security event.
+
+### 17.4 Protocol, Packet Size, and Compression Strategy
+
+Oracle Net can run with:
+
+- Plain network communication
+- SSL/TLS
+- Checksumming
+
+With Oracle Net config (not bare Easy Connect), you can tune:
+
+- Packet sizing
+- Compression
+
+Compression guidance:
+
+- Set a sensible threshold.
+- Do not compress low traffic blindly (CPU overhead can outweigh gains).
+- Compress when traffic volume is high enough to justify CPU cost.
+
+### 17.5 Service Name + Domain + Alias
+
+The fully qualified network service is:
+
+```text
+service_name.network_domain
+```
+
+Example:
+
+```text
+FINANCE.us.flowers.com
+```
+
+Client apps usually connect using an alias, not the full service name:
+
+```text
+FINFLOWERS
+```
+
+`tnsnames.ora` maps alias -> real connect descriptor.
+
+Small security side effect:
+
+- If someone only recovers the app alias, they still need network naming data
+ to resolve the real destination.
+
+Not bulletproof security, but useful indirection.
+
+### 17.6 `tnsping` Reality Check
+
+`tnsping` checks whether naming resolves to a listener that responds.
+
+It does **not** validate end-to-end database login.
+
+So:
+
+- `tnsping` success = listener reachable for that service naming path.
+- `tnsping` failure = naming/listener/routing issue before authentication.
+
+### 17.7 One Listener, Many Databases, Many Services
+
+A single listener can front:
+
+- Multiple databases
+- Multiple services per database
+
+Connection lifecycle:
+
+1. Client resolves naming.
+2. Request reaches listener.
+3. Listener selects supporting instance for requested service.
+4. Listener hands user process to server process.
+5. Session proceeds directly client <-> server process.
+
+Listener is only for connection establishment, not ongoing query traffic.
+
+### 17.8 HA and Failover Placement
+
+Failover/load balancing can be defined in:
+
+- Database service config (recommended)
+- TNS descriptor (`LOAD_BALANCE=ON`, `FAILOVER=ON`)
+
+Why service-level is preferred:
+
+- Centralized on database side
+- Less TNS sprawl on clients
+- Easier long-term maintenance
+
+### 17.9 Naming Methods Recap (With Operational Tradeoffs)
+
+- Easy Connect:
+ - Direct connect string to listener.
+ - Enabled by default.
+ - Fast for labs; limited centralized control.
+
+- Local naming (`tnsnames.ora`):
+ - Requires file distribution to every relevant client/server host.
+ - Any change means many updates unless automated.
+
+- Directory naming (LDAP):
+ - Store naming once in directory.
+ - Clients and servers query centrally via `ldap.ora`.
+
+- Global naming (Oracle directory integration):
+ - Oracle-aware directory behavior for centralized naming/auth workflows.
+
+- External naming (third-party/OS-based patterns):
+ - Use with caution if Oracle-side reauthentication is not enforced.
+
+### 17.10 Security Caveat: External/OS Authentication Can Ignore Provided Credentials
+
+Lecture demo takeaway:
+
+- Local OS-authenticated admin path can allow connection based on OS identity
+ and group membership.
+- Supplied username/password may be ignored in that path.
+- Through Oracle Net service connection, authentication checks are enforced
+ normally and bad credentials fail.
+
+That is the difference between:
+
+- "I am trusted because of local OS context."
+- "I must prove identity over a network authentication path."
+
+Treat external naming choices as security architecture decisions, not just
+convenience settings.
+
+---
+
+## 18. Naming Method Walkthrough: Easy Connect vs Local Naming vs LDAP (And The Save Button That Betrays Everyone)
+
+This lecture block is the practical continuation of naming decisions:
+
+- Easy Connect is simple but limited.
+- Local naming (`tnsnames.ora`) is flexible but operationally heavier.
+- LDAP centralizes naming, but only if correctly wired through `sqlnet.ora` and `ldap.ora`.
+
+### 18.1 Easy Connect: Fast, Minimal, Constrained
+
+Easy Connect puts the full destination in the connect string:
+
+```text
+user/password@host:port/service_name
+```
+
+So the client goes directly to the listener host/port with no alias resolution.
+
+Tradeoffs called out in the lecture:
+
+- Limited security controls inside Easy Connect itself.
+- Limited complexity for load balancing/failover expressions.
+- Common in app tiers (historically JDBC thin inside same firewall).
+
+Why teams like it:
+
+- No Oracle network files on app hosts.
+- No DBA-side client file management burden.
+
+Why DBAs side-eye it in production:
+
+- Less centralized control for richer Oracle Net policies.
+
+### 18.2 Local Naming: `tnsnames.ora` Mechanics
+
+Local naming requires a `tnsnames.ora` on the local host.
+
+Default Oracle Net location:
+
+```bash
+$ORACLE_HOME/network/admin
+```
+
+If `TNS_ADMIN` is unset, Oracle uses that default location.
+
+Core files reviewed in demo:
+
+- `listener.ora`
+- `sqlnet.ora`
+- `tnsnames.ora`
+
+`sqlnet.ora` defines naming path order and resolution methods.
+`tnsnames.ora` maps alias names to actual descriptors/services.
+
+### 18.3 Demo Flow Captured in Notes
+
+The lecture demonstrates this sequence:
+
+1. Copy an existing `tnsnames.ora` entry.
+2. Change only the alias (example: create `RON1`).
+3. Connect via:
+
+```bash
+sqlplus system/oracle_4U@ron1
+```
+
+4. Oracle resolves alias -> descriptor -> listener -> service.
+
+Then validation using:
+
+```bash
+tnsping RON1
+```
+
+Important clarification:
+
+- `tnsping` validates naming resolution and listener response.
+- It does not prove full SQL authentication/authorization workflow.
+
+### 18.4 File Editing Rules (Because Hidden Characters Are Silent Killers)
+
+The lecture warning is correct and worth repeating:
+
+- Use plain text editors for Oracle Net files.
+- Avoid tools that inject formatting/hidden characters.
+- Oracle Net parsing is sensitive; one odd character can break resolution.
+
+### 18.5 Net Manager (`netmgr`) Behavior and the Save Trap
+
+Net Manager can create/edit service aliases cleanly, including:
+
+- alias (net service name)
+- protocol/host/port
+- target service name
+- connection type options (dedicated/shared/pooling)
+- test login
+
+Critical operational gotcha:
+
+- Completing the wizard is not always the same as writing to disk.
+- Use explicit **Save Network Configuration** before exiting.
+
+Lecture demo showed alias creation appearing complete in UI, but not present
+in `tnsnames.ora` until manual save was executed.
+
+### 18.6 Alias vs Service Name: Do Not Confuse Them
+
+In tooling screens:
+
+- The first "net service name" is usually your alias (client-facing label).
+- `SERVICE_NAME` in connect data is the actual database service target.
+
+They can match, but usually should not, if you want indirection and cleaner
+application abstraction.
+
+### 18.7 LDAP Naming: Same Consumer Pattern, Central Source
+
+Client-side usage can still look like alias-based connect syntax, but resolution
+moves from local `tnsnames.ora` copies to directory-backed naming:
+
+- `sqlnet.ora` includes LDAP in naming path.
+- `ldap.ora` points to directory host/port/context.
+- Client queries directory for service descriptor.
+
+Result:
+
+- One central update instead of editing many local files.
+
+### 18.8 Services as Operational Control Points
+
+You can create multiple services targeting the same instance or PDB for
+different operational domains (app users, admin flows, backup tasks, etc.).
+
+Why that helps:
+
+- Per-service visibility of connection counts and resource usage.
+- Per-service behavior tuning and routing policy.
+
+Single instance:
+
+- Use `DBMS_SERVICE` directly.
+
+RAC:
+
+- Prefer `srvctl` for service lifecycle.
+- `srvctl` integrates with cluster management and can orchestrate DB-side service operations.
+
+In short: in RAC, let the cluster manager drive service truth.
