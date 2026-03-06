@@ -50,6 +50,74 @@ Each lesson is written as:
 
 - [10_ASM_Disk_Group_Sector_Size_Management.md](10_ASM_Disk_Group_Sector_Size_Management.md)
 
+## 11 - ASM Disk Group Management Part 1
+
+- [11_ASM_Disk_Group_Management_Part_1.md](11_ASM_Disk_Group_Management_Part_1.md)
+
+## 12 - ASM Disk Group Management Part 2
+
+- [12_ASM_Disk_Group_Management_Part_2.md](12_ASM_Disk_Group_Management_Part_2.md)
+
+## 13 - ASM Disk Group Capacity Management and Partner Disk Groups
+
+- [13_ASM_Disk_Group_Capacity_Management_and_Partner_Disk_Groups.md](13_ASM_Disk_Group_Capacity_Management_and_Partner_Disk_Groups.md)
+
+## 14 - ASM Disk Group IO Errors and Scrubbing
+
+- [14_ASM_Disk_Group_IO_Errors_and_Scrubbing.md](14_ASM_Disk_Group_IO_Errors_and_Scrubbing.md)
+
+## 15 - ASM Disk Group Fast Mirror Resync
+
+- [15_ASM_Disk_Group_Fast_Mirror_Resync.md](15_ASM_Disk_Group_Fast_Mirror_Resync.md)
+
+## 16 - ASM Flex Disk Group Operation and Management
+
+- [16_ASM_Flex_Disk_Group_Operation_and_Management.md](16_ASM_Flex_Disk_Group_Operation_and_Management.md)
+
+## 17 - ASM Client Tools
+
+- [17_ASM_Client_Tools.md](17_ASM_Client_Tools.md)
+
+## 18 - ASM Files
+
+- [18_ASM_Files.md](18_ASM_Files.md)
+
+## 19 - ASM Directories, Aliases, Templates, ACLs
+
+- [19_ASM_Directories_Aliases_Templates_ACLs.md](19_ASM_Directories_Aliases_Templates_ACLs.md)
+
+## 20 - ASM ADVM and ACFS Overview
+
+- [20_ASM_ADVM_and_ACFS_Overview.md](20_ASM_ADVM_and_ACFS_Overview.md)
+
+## 21 - ASM ADVM and ACFS Creation
+
+- [21_ASM_ADVM_and_ACFS_Creation.md](21_ASM_ADVM_and_ACFS_Creation.md)
+
+## 22 - ASM ACFS Administration
+
+- [22_ASM_ACFS_Administration.md](22_ASM_ACFS_Administration.md)
+
+## 23 - ASM ACFS Auto Resize, Scrubbing, and Defragmentation
+
+- [23_ASM_ACFS_Auto_Resize_Scrubbing_and_Defragmentation.md](23_ASM_ACFS_Auto_Resize_Scrubbing_and_Defragmentation.md)
+
+## 24 - ASM ACFS Metadata Accelerator, Sparse Files, and Loopback Operations
+
+- [24_ASM_ACFS_Metadata_Accelerator_Sparse_Files_and_Loopback_Operations.md](24_ASM_ACFS_Metadata_Accelerator_Sparse_Files_and_Loopback_Operations.md)
+
+## 25 - Appendix A-1: Configuring High Availability NFS and ACFS Encryption
+
+- [25_Appendix_A_1_Configuring_High_Availability_NFS_and_ACFS_Encryption.md](25_Appendix_A_1_Configuring_High_Availability_NFS_and_ACFS_Encryption.md)
+
+## 26 - Appendix A-2: ACFS Replication
+
+- [26_Appendix_A_2_ACFS_Replication.md](26_Appendix_A_2_ACFS_Replication.md)
+
+## 27 - Appendix B-1: Point-in-Time Database Clones
+
+- [27_Appendix_B_1_Point_in_Time_Database_Clones.md](27_Appendix_B_1_Point_in_Time_Database_Clones.md)
+
 ---
 
 ## In Progress
