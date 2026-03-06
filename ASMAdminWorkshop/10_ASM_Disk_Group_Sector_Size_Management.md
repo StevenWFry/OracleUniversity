@@ -1,6 +1,6 @@
 ## Lesson 10 - ASM Disk Group Sector Size Management (in which tiny I/O math decides whether your storage is elegant or furious)
 
-This chapter drills into one of those settings that sounds boring right up until it breaks mounts, slows writes, or makes migrations awkward: sector size.
+And look, this chapter drills into one of those settings that sounds boring right up until it breaks mounts, slows writes, or makes migrations awkward: sector size.
 
 By the end of this lesson, you should be able to:
 

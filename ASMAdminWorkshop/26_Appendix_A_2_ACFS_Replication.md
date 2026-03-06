@@ -1,6 +1,6 @@
 ## Appendix A-2 - ACFS Replication (in which snapshots become your long-distance disaster-recovery relationship)
 
-This appendix covers ACFS snapshot-based replication: how a primary ACFS file system ships snapshots to a standby file system, and how to keep that pipeline secure, stable, and not on fire.
+And look, this appendix covers ACFS snapshot-based replication: how a primary ACFS file system ships snapshots to a standby file system, and how to keep that pipeline secure, stable, and not on fire.
 
 By the end of this appendix, you should be able to:
 

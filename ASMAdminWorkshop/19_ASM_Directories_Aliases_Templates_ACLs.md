@@ -1,6 +1,6 @@
 ## Lesson 19 - ASM Directories, Aliases, Templates, ACLs (in which storage paths get civilized and permissions stop being vibes)
 
-This chapter is the practical file-management layer in ASM: directory layout, alias indirection, template-driven file behavior, and ACL-based access control.
+And look, this chapter is the practical file-management layer in ASM: directory layout, alias indirection, template-driven file behavior, and ACL-based access control.
 
 By the end of this lesson, you should be able to:
 

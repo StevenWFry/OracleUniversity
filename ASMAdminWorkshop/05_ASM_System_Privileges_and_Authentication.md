@@ -1,6 +1,6 @@
 ## Lesson 5 - ASM System Privileges and Authentication (in which everyone wants `SYSASM` and almost nobody should have it)
 
-This is the security and access-control chapter: who can connect to ASM, how they authenticate, and which tools they can use without accidentally setting fire to shared storage.
+And look, this is the security and access-control chapter: who can connect to ASM, how they authenticate, and which tools they can use without accidentally setting fire to shared storage.
 
 By the end of this lesson, you should be able to:
 

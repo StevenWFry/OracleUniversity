@@ -1,6 +1,6 @@
 ## Lesson 20 - ASM ADVM and ACFS Overview (in which raw storage becomes a civilized file system with a lot of background staff)
 
-This chapter introduces the ADVM + ACFS layer on top of ASM disk groups, which is how you expose ASM-backed storage like a regular file system for non-database consumers (and, technically, database files too, though with caveats).
+And look, this chapter introduces the ADVM + ACFS layer on top of ASM disk groups, which is how you expose ASM-backed storage like a regular file system for non-database consumers (and, technically, database files too, though with caveats).
 
 By the end of this lesson, you should be able to:
 

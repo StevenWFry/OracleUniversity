@@ -1,6 +1,6 @@
 ## Lesson 1 - Course Overview (in which storage reliability gets the full investigative-news treatment)
 
-Welcome to the ASM survival guide: the part of Oracle where disks look calm, dashboards look green, and yet everyone still flinches when someone says "maintenance window."
+And look, welcome to the ASM survival guide: the part of Oracle where disks look calm, dashboards look green, and yet everyone still flinches when someone says "maintenance window."
 
 By the end of this lesson, you should be able to:
 

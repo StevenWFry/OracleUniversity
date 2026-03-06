@@ -1,6 +1,6 @@
 ## Lesson 16 - ASM Flex Disk Group Operation and Management (in which storage policy becomes database-specific instead of one-size-fits-all)
 
-Everything so far applied to general disk group administration. Flex disk groups add targeted policy control so different databases/PDBs can behave differently inside the same storage universe without everyone fighting over one default setting.
+And look, everything so far applied to general disk group administration. Flex disk groups add targeted policy control so different databases/PDBs can behave differently inside the same storage universe without everyone fighting over one default setting.
 
 By the end of this lesson, you should be able to:
 

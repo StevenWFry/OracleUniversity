@@ -1,6 +1,6 @@
 ## Lesson 2 - ASM Overview (in which storage gets a traffic controller and everyone is calmer)
 
-Welcome to the part of Oracle storage where "just mount a disk" evolves into a full municipal government with zoning laws, safety codes, and a clipboard named ASM.
+And look, welcome to the part of Oracle storage where "just mount a disk" evolves into a full municipal government with zoning laws, safety codes, and a clipboard named ASM.
 
 This lesson sets the stage for how ASM sits between clients and storage, why that matters, and what components you need to understand before touching production disk groups like a caffeine-powered goblin.
 

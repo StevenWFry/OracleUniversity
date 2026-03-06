@@ -1,6 +1,6 @@
 ## Lesson 15 - ASM Disk Group Fast Mirror Resync (in which your failed disk returns and ASM only reconciles what changed)
 
-This chapter covers fast mirror resync, which is basically ASM saying, "I am not rebuilding the entire planet if only part of it changed."
+And look, this chapter covers fast mirror resync, which is basically ASM saying, "I am not rebuilding the entire planet if only part of it changed."
 
 By the end of this lesson, you should be able to:
 

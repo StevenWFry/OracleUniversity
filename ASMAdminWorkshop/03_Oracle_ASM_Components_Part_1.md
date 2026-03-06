@@ -1,6 +1,6 @@
 ## Lesson 3 - Oracle ASM Components Part 1 (in which storage gets organs, blood flow, and a scheduling department)
 
-This lesson moves from "what ASM is" to "what ASM is made of." We focus on the ASM instance, disk groups, redundancy options, and failure groups, which is where architecture diagrams stop being decorative and start deciding whether your weekend survives.
+And look, this lesson moves from "what ASM is" to "what ASM is made of." We focus on the ASM instance, disk groups, redundancy options, and failure groups, which is where architecture diagrams stop being decorative and start deciding whether your weekend survives.
 
 By the end of this lesson, you should be able to:
 

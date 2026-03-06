@@ -1,6 +1,6 @@
 ## Lesson 22 - ASM ACFS Administration (in which your file system gets snapshots, utilities, and enough knobs to ruin a weekend)
 
-This chapter covers day-to-day ACFS administration after creation: utility commands, resource integration, mapping views, snapshots, backup strategy, and performance tuning context.
+And look, this chapter covers day-to-day ACFS administration after creation: utility commands, resource integration, mapping views, snapshots, backup strategy, and performance tuning context.
 
 By the end of this lesson, you should be able to:
 

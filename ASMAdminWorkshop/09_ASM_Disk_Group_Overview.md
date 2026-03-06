@@ -1,6 +1,6 @@
 ## Lesson 9 - ASM Disk Group Overview (in which storage gets promoted from "some disks" to a full governance regime)
 
-This is Part 1 of disk group administration. Disk groups are the core storage unit in ASM, so once you understand these, the rest of ASM stops feeling like a magic trick performed by a very expensive wizard.
+And look, this is Part 1 of disk group administration. Disk groups are the core storage unit in ASM, so once you understand these, the rest of ASM stops feeling like a magic trick performed by a very expensive wizard.
 
 By the end of this lesson, you should be able to:
 

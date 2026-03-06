@@ -1,6 +1,6 @@
 ## Appendix B-1 - Point-in-Time Database Clones (in which ASM mirror copies become your instant clone machine)
 
-This appendix covers point-in-time PDB cloning using ASM mirrors: split a mirror copy, create a clone from it, then rebalance to restore mirror protection on the source side.
+And look, this appendix covers point-in-time PDB cloning using ASM mirrors: split a mirror copy, create a clone from it, then rebalance to restore mirror protection on the source side.
 
 By the end of this appendix, you should be able to:
 

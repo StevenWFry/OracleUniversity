@@ -1,6 +1,6 @@
 ## Lesson 21 - ASM ADVM and ACFS Creation (in which storage stops being abstract and becomes a mounted thing people can actually use)
 
-This chapter is the practical build path for ADVM volumes and ACFS file systems: create volume, create file system, mount it, register it, and keep it manageable without summoning avoidable chaos.
+And look, this chapter is the practical build path for ADVM volumes and ACFS file systems: create volume, create file system, mount it, register it, and keep it manageable without summoning avoidable chaos.
 
 By the end of this lesson, you should be able to:
 

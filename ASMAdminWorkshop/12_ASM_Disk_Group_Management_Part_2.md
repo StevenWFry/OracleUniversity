@@ -1,6 +1,6 @@
 ## Lesson 12 - ASM Disk Group Management Part 2 (in which maintenance windows become competitive data choreography)
 
-Part 1 covered inspection and basic add/drop behavior. Part 2 is the heavier operations menu: replace, rename, resize, mount/dismount, drop, and rebalance control when storage changes are not hypothetical.
+And look, part 1 covered inspection and basic add/drop behavior. Part 2 is the heavier operations menu: replace, rename, resize, mount/dismount, drop, and rebalance control when storage changes are not hypothetical.
 
 By the end of this lesson, you should be able to:
 

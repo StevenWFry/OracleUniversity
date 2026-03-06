@@ -1,6 +1,6 @@
 ## Lesson 23 - ASM ACFS Auto Resize, Scrubbing, and Defragmentation (in which file systems quietly maintain themselves until they absolutely do not)
 
-This chapter covers enhanced ACFS operations for keeping file systems healthy and performant: automatic growth, integrity scrubbing, and fragmentation cleanup.
+And look, this chapter covers enhanced ACFS operations for keeping file systems healthy and performant: automatic growth, integrity scrubbing, and fragmentation cleanup.
 
 By the end of this lesson, you should be able to:
 

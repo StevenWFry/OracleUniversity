@@ -1,6 +1,6 @@
 ## Lesson 14 - ASM Disk Group IO Errors and Scrubbing (in which storage corruption gets audited, repaired, and occasionally publicly shamed)
 
-This chapter covers how ASM reacts when I/O goes bad, how it uses mirrors and partner metadata to recover, and how scrubbing/check operations keep disk groups from quietly decaying into chaos.
+And look, this chapter covers how ASM reacts when I/O goes bad, how it uses mirrors and partner metadata to recover, and how scrubbing/check operations keep disk groups from quietly decaying into chaos.
 
 By the end of this lesson, you should be able to:
 

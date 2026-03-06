@@ -1,6 +1,6 @@
 ## Lesson 17 - ASM Client Tools (in which storage admin becomes equal parts SQL surgeon and command-line raccoon)
 
-This chapter shifts from managing ASM infrastructure to managing what lives inside it: files, directories, aliases, and templates, using the client tools that actually touch ASM storage paths.
+And look, this chapter shifts from managing ASM infrastructure to managing what lives inside it: files, directories, aliases, and templates, using the client tools that actually touch ASM storage paths.
 
 By the end of this lesson, you should be able to:
 

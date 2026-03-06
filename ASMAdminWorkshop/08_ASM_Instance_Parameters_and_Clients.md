@@ -1,6 +1,6 @@
 ## Lesson 8 - ASM Instance Parameters and Clients (in which metadata traffic gets a seating chart and rebalance gets a throttle)
 
-This chapter is where Flex ASM stops being a concept and becomes operations: cardinality, client placement, relocation behavior, and the parameters that decide whether your storage layer glides or wheezes.
+And look, this chapter is where Flex ASM stops being a concept and becomes operations: cardinality, client placement, relocation behavior, and the parameters that decide whether your storage layer glides or wheezes.
 
 By the end of this lesson, you should be able to:
 

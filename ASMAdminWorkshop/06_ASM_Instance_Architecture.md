@@ -1,6 +1,6 @@
 ## Lesson 6 - ASM Instance Architecture (in which not every node needs an ASM roommate anymore)
 
-Welcome to Flex ASM land, where the old rule of "one ASM instance per node" gets replaced with "calm down, share responsibly."
+And look, welcome to Flex ASM land, where the old rule of "one ASM instance per node" gets replaced with "calm down, share responsibly."
 
 By the end of this lesson, you should be able to:
 

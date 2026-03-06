@@ -1,6 +1,6 @@
 ## Lesson 7 - ASM Instance Management (in which listeners, proxies, and `srvctl` run the neighborhood watch)
 
-This chapter is about actually operating ASM instances in a Flex environment without causing a cluster-wide existential crisis.
+And look, this chapter is about actually operating ASM instances in a Flex environment without causing a cluster-wide existential crisis.
 
 By the end of this lesson, you should be able to:
 

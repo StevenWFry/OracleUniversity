@@ -1,6 +1,6 @@
 ## Lesson 4 - Oracle ASM Components Part 2 (in which disks, extents, and stripes become a full-time logistics operation)
 
-Part 1 covered the "who" (instances, disk groups, failure groups). Part 2 covers the "how" data is physically organized and consumed: ASM disks, allocation units, extents, striping, file naming, and client behavior. This is the chapter where storage becomes a shipping company with anxiety.
+And look, part 1 covered the "who" (instances, disk groups, failure groups). Part 2 covers the "how" data is physically organized and consumed: ASM disks, allocation units, extents, striping, file naming, and client behavior. This is the chapter where storage becomes a shipping company with anxiety.
 
 By the end of this lesson, you should be able to:
 

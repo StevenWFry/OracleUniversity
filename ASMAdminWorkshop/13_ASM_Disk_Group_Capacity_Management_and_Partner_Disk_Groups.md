@@ -1,6 +1,6 @@
 ## Lesson 13 - ASM Disk Group Capacity Management and Partner Disk Groups (in which "free space" turns out to be a complicated lie)
 
-This chapter goes deeper into disk-group operations where capacity math, redundancy guarantees, and rebuild metadata all collide. If you only look at `FREE_MB` and call it a day, ASM will eventually send you a strongly worded outage.
+And look, this chapter goes deeper into disk-group operations where capacity math, redundancy guarantees, and rebuild metadata all collide. If you only look at `FREE_MB` and call it a day, ASM will eventually send you a strongly worded outage.
 
 By the end of this lesson, you should be able to:
 

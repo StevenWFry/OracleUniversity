@@ -1,6 +1,6 @@
 ## Lesson 18 - ASM Files (in which filenames become both a science and a low-key identity crisis)
 
-This chapter is about how ASM names files, how humans reference files, and how to see what actually exists without guessing your way through plus-sign hierarchies.
+And look, this chapter is about how ASM names files, how humans reference files, and how to see what actually exists without guessing your way through plus-sign hierarchies.
 
 By the end of this lesson, you should be able to:
 

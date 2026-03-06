@@ -1,6 +1,6 @@
 ## Lesson 24 - ASM ACFS Metadata Accelerator, Sparse Files, and Loopback Operations (in which metadata gets turbocharged and zero-filled holes become optional)
 
-This chapter covers advanced ACFS features that improve diagnostics and workload behavior under specific patterns: metadata collection, metadata accelerator, 4K metadata sector support, sparse files, and loopback device workflows.
+And look, this chapter covers advanced ACFS features that improve diagnostics and workload behavior under specific patterns: metadata collection, metadata accelerator, 4K metadata sector support, sparse files, and loopback device workflows.
 
 By the end of this lesson, you should be able to:
 

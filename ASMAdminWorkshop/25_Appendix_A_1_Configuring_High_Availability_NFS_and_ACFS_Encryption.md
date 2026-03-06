@@ -1,6 +1,6 @@
 ## Appendix A-1 - Configuring High Availability NFS and ACFS Encryption (in which your file system gets a VIP and a bodyguard)
 
-This appendix covers two advanced ACFS topics:
+And look, this appendix covers two advanced ACFS topics:
 
 - exporting ACFS as highly available NFS service in a cluster
 - encrypting ACFS content for at-rest protection

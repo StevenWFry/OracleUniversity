@@ -1,6 +1,6 @@
 ## Lesson 11 - ASM Disk Group Management Part 1 (in which adding one disk can trigger an entire moving company)
 
-This chapter focuses on operational disk-group management: how to inspect state, add/remove disks, and monitor rebalance activity without accidentally turning maintenance into an outage festival.
+And look, this chapter focuses on operational disk-group management: how to inspect state, add/remove disks, and monitor rebalance activity without accidentally turning maintenance into an outage festival.
 
 By the end of this lesson, you should be able to:
 
