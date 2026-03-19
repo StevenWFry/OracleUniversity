@@ -2,13 +2,13 @@
 
 ## Purpose
 
-This repository is a Markdown-first study-notes repo built from Oracle University course video transcripts.
+This repository is a Markdown-first study-notes repo built from Oracle University course source material, often including video transcripts.
 
 The default task in this repo is not software development. It is turning rough transcript material into clean, readable, lesson-by-lesson study notes.
 
 ## Default Assumptions
 
-- Treat pasted transcript text as source material for a lesson note unless the user says otherwise.
+- Treat pasted source text as material for a lesson note unless the user says otherwise.
 - Prefer creating or updating one Markdown file per lesson.
 - Follow the existing filename pattern in the target folder, such as `01_Course_Overview.md` or `04_Backup_and_Recovery_Configuration.md`.
 - This repo is primarily documentation content. Do not spend time looking for build, test, or lint systems unless the user explicitly asks.
@@ -37,7 +37,7 @@ Turn Oracle training transcripts into notes that are:
 - technically accurate
 - easy to scan
 - useful for exam prep and review
-- much more entertaining than the source transcript
+- much more entertaining than the source material
 
 ## Voice And Tone
 
@@ -51,7 +51,7 @@ Target qualities:
 - willing to call out bad design, fragile setups, and failure modes
 - readable enough that the humor helps retention instead of getting in the way
 
-Make it as if John Oliver himself is describing the content as he does on his show.
+Aim for the general feel of sharp, satirical, high-energy explanatory comedy without directly imitating any specific living person.
 
 ## Lesson Structure
 
@@ -76,8 +76,9 @@ Use `---` between major sections when it matches nearby files.
 - Keep Oracle terminology, parameter names, dynamic performance views, and commands exact.
 - Convert rambling spoken explanations into structured notes.
 - Highlight operational consequences: what breaks, what fills up, what fails over, what must be multiplexed, what requires downtime, and what actually matters in practice.
-- If the transcript mixes lecture and demo content, organize it cleanly instead of preserving the original disorder.
-- If something in the transcript is unclear, mark it carefully rather than inventing facts.
+- If the source material mixes lecture and demo content, organize it cleanly instead of preserving the original disorder.
+- If something in the source material is unclear, mark it carefully rather than inventing facts.
+- Do not mention transcripts, transcript segments, or source-material mechanics inside the finished lesson notes. Present them as polished standalone study notes.
 
 ## Formatting Preferences
 
