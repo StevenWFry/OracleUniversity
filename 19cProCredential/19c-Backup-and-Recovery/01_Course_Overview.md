@@ -12,6 +12,58 @@ By the end of this lesson, you should be able to:
 
 ---
 
+## Course Table of Contents
+
+### Foundations and Configuration
+
+- [Lesson 2 - Backup and Recovery Overview](02_Backup_and_Recovery_Overview.md)
+- [Lesson 3 - Understanding Instance Recovery](03_Understanding_Instance_Recovery.md)
+- [Lesson 4 - Backup and Recovery Configuration](04_Backup_and_Recovery_Configuration.md)
+- [Lesson 5 - Backup and Recovery Configuration Demos and Practices](05_Backup_and_Recovery_Configuration_Demos_and_Practices.md)
+- [Lesson 6 - Backup and Recovery Configuration Practices](06_Backup_and_Recovery_Configuration_Practices.md)
+
+### RMAN and Backup Operations
+
+- [Lesson 7 - Using Recovery Manager](07_Using_Recovery_Manager.md)
+- [Lesson 8 - Using Recovery Manager Demos and Practices](08_Using_Recovery_Manager_Demos_and_Practices.md)
+- [Lesson 9 - Backup Strategies](09_Backup_Strategies.md)
+- [Lesson 10 - Creating Database Backups](10_Creating_Database_Backups.md)
+- [Lesson 11 - Tuning RMAN Backup and Recovery Performance](11_Tuning_RMAN_Backup_and_Recovery_Performance.md)
+
+### Recovery Catalog
+
+- [Lesson 12 - Recovery Catalog Overview](12_Recovery_Catalog_Overview.md)
+- [Lesson 13 - Creating a Recovery Catalog](13_Creating_a_Recovery_Catalog.md)
+- [Lesson 14 - Managing Target Database Records in the Recovery Catalog](14_Managing_Target_Database_Records_in_the_Recovery_Catalog.md)
+- [Lesson 15 - Using Stored Scripts in the Recovery Catalog](15_Using_Stored_Scripts_in_the_Recovery_Catalog.md)
+- [Lesson 16 - Creating and Using Virtual Private Catalogs](16_Creating_and_Using_Virtual_Private_Catalogs.md)
+
+### Restore and Recovery
+
+- [Lesson 17 - Understanding Restore and Recovery Technology](17_Understanding_Restore_and_Recovery_Technology.md)
+- [Lesson 18 - Diagnosing Failures](18_Diagnosing_Failures.md)
+- [Lesson 19 - Data Recovery Advisor](19_Data_Recovery_Advisor.md)
+- [Lesson 20 - Performing Complete Recovery](20_Performing_Complete_Recovery.md)
+- [Lesson 21 - Performing Point in Time Recovery](21_Performing_Point_in_Time_Recovery.md)
+- [Lesson 22 - Performing Incomplete Recovery Using the Data Recovery Advisor](22_Performing_Incomplete_Recovery_Using_the_Data_Recovery_Advisor.md)
+- [Lesson 23 - Performing Block Media Recovery](23_Performing_Block_Media_Recovery.md)
+- [Lesson 24 - Performing Additional Recovery Operations](24_Performing_Additional_Recovery_Operations.md)
+
+### Flashback and Time-Based Recovery
+
+- [Lesson 25 - Oracle Flashback Technology Overview](25_Oracle_Flashback_Technology_Overview.md)
+- [Lesson 26 - Using Logical Flashback Features](26_Using_Logical_Flashback_Features.md)
+- [Lesson 27 - Using Flashback Drop and Temporal Features](27_Using_Flashback_Drop_and_Temporal_Features.md)
+- [Lesson 28 - Using Flashback Database](28_Using_Flashback_Database.md)
+- [Lesson 29 - Using PDB Snapshots](29_Using_PDB_Snapshots.md)
+
+### Duplication and Cloning
+
+- [Lesson 30 - Database Duplication Overview](30_Database_Duplication_Overview.md)
+- [Lesson 31 - Creating a Backup Based Duplicate Database](31_Creating_a_Backup_Based_Duplicate_Database.md)
+
+---
+
 ## 1. What This Course Covers (the survival kit)
 
 This course is about keeping databases alive, or at least resuscitating them when they faint. You will learn:

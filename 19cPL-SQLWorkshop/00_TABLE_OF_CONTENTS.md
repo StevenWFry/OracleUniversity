@@ -9,9 +9,9 @@ Each lesson comes in two flavors:
 
 ---
 
-## 01 - Course Overview
+## 00 - Course Overview
 
-- [01_Course Overview.md](01_Course%20Overview.md)
+- [00_Course_Overview.md](00_Course_Overview.md)
 
 ## 02 - Course Introduction
 
